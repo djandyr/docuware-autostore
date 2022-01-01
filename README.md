@@ -2,7 +2,7 @@
 
 Automatically store documents from document tray to file cabinet. Multiple tasks can be configured with different trays, intellix trusts levels, document title masks and processing limits.
 
-This script addresses lack of automation in DocuWare trays forcing user to manually to store all documents regardless. Even if the intelligent indexing confidence score is high (green)
+This script addresses lack of automation in DocuWare trays forcing user to manually to store all documents regardless, even if the intelligent indexing confidence score is high (green)
 
 For scenarios where DocuWare is used to intelligently index large volumes of document or emails lack any manual intervention can quickly become unmaintainable.
 
