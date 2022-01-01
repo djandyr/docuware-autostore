@@ -1,6 +1,6 @@
 # Docuware Autostore
 
-Automatically store documents from document tray to file cabinet. Multiple tasks can be configured with different intellix trusts levels, document title masks and processing limits.
+Automatically store documents from document tray to file cabinet. Multiple tasks can be configured with different trays, intellix trusts levels, document title masks and processing limits.
 
 This script addresses lack of automation in DocuWare trays forcing user to manually to store all documents regardless. Even if the intelligent indexing confidence score is high (green)
 
