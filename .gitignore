@@ -1,0 +1,7 @@
+node_modules
+temp
+download
+dist
+.vs
+container.tar
+config.json
