@@ -1,5 +1,5 @@
 import { RestApiWrapper } from "./restApiWrapper";
-import { IConfig } from "./types/Config";
+import { IConfig, IAutoStoreConfig } from "./types/Config";
 import polly from "polly-js";
 import chalk from 'chalk';
 import * as DWRest from "./types/DW_Rest";
@@ -15,6 +15,7 @@ const argv = yargs(process.argv.slice(2))
   }).parseSync();
 
 const config: IConfig = JSON.parse(fs.readFileSync(argv.config, 'utf8'));
+const defaultIntellixTrusts:string[] = ["Green"]; // Only allow "Green" intellix trust if not configured
 
 // Docuware REST API Wrapper
 const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
@@ -52,10 +53,7 @@ polly()
 
       console.log(chalk.whiteBright("\t> Document Tray:"), chalk.white(`${documentTray.Name} (Id: ${documentTray.Id})`));
       console.log(chalk.whiteBright("\t> File Cabinet:"), chalk.white(`${fileCabinet.Name} (Id: ${fileCabinet.Id})`));
-
-      if(task.intellixTrust && task.intellixTrust.length > 0) {
-        console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(task.intellixTrust.join(',')));
-      }
+      console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrustFromConfig(task).join(',')));
 
       if(task.documentTitleMask) {
         console.log(chalk.whiteBright("\t> Document Title Mask:"), chalk.white(task.documentTitleMask));
@@ -64,7 +62,7 @@ polly()
       const documentIds: number[] = [];
       documentsFromTray.Items.forEach(doc => {
         if (
-          isIntellixTrustAllowed(doc, task.intellixTrust ?? []) &&
+          isDocumentIntellixTrustAllowed(doc, getAllowedIntellixTrustFromConfig(task)) &&
           isDocumentTitleMaskAllowed(doc, task.documentTitleMask ?? '') &&
           doc.Id) {
           documentIds.push(doc.Id)
@@ -87,10 +85,21 @@ polly()
   });
 
 /**
- * Do documents match allowed intellix trusts (intelligent indexing scores)?
+ * Get allowed intellix trusts from configuration
  * 
- * If intellix trust matches then allow
- * If no intellix trusts are defined via configuration allow all by default
+ * @param config
+ * @returns 
+ */ 
+function getAllowedIntellixTrustFromConfig(config:IAutoStoreConfig)  {
+    if(!config.intellixTrust) {
+      return defaultIntellixTrusts;
+    }
+
+    return config.intellixTrust;
+}
+
+/**
+ * Is documents intellix trust allowed to be stored?
  * 
  * Failed	    - Intelix failed
  * Green      - Recognized
@@ -103,9 +112,8 @@ polly()
  * @param config 
  * @returns 
  */
-function isIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
-  return (intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
-    || intellixTrust.length === 0)
+function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
+  return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
 }
 
 /**

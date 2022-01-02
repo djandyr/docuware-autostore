@@ -90,7 +90,9 @@ npm run start -- --config ./other/config.json
 > 
 > * __autoStore.intellixTrust__    
 > 
->    List of allowed intellix trusts enums for a specific autostore task. Documents will be stored if enums matches the intellix trust assigned to document. If no enums are defined for tasks all intellix trusts are allowed.
+>    List of allowed intellix trusts for autostore task. Documents will be stored by matching to intellix trust assigned to document. If no allowed intellix trusts are configured only "Green" is allowed by default.
+> 
+>    See https://developer.docuware.com/sdk/platform-fox/html/T_DocuWare_Platform_ServerClient_IntellixTrust.htm
 > 
 > * __autoStore.documentTitleMask__    
 > 
