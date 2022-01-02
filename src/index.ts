@@ -12,7 +12,7 @@ const argv = yargs(process.argv.slice(2))
     alias: "c",
     default: "./config.json",
     describe: "Config file path"
-  }).parseSync();
+  }).parse();
 
 const config: IConfig = JSON.parse(fs.readFileSync(argv.config, 'utf8'));
 const defaultIntellixTrusts:string[] = ["Green"]; // Only allow "Green" intellix trust if not configured
