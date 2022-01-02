@@ -96,7 +96,7 @@ npm run start -- --config ./other/config.json
 > 
 > * __autoStore.documentFilter__    
 >    
->    Filter source documents by boolean matching from file cabinet via glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
+>    Filter source documents by boolean matching via glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
 >    
 >    * name {String}: Name of predefined filter
 >    * pattern {String|Array}: One or more glob patterns to use for matching.
