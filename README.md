@@ -37,13 +37,14 @@ npm run start -- --config ./other/config.json
 ```
 {
     "rootUrl": "https://my.docuware.cloud/",
-    "user": "andy.roberts@warrant-group.com",
-    "password": "yourpassword",
+    "user": "username",
+    "password": "password",
     "hostID": "7b5ed19b-bfd6-46e9-8a3b-efd2a4499666",
     "autoStore": [
         {
             "fileCabinetID": "c74e4dbb-51ec-4594-a74d-125a9af52b66",
             "documentTrayID": "b_243312da-a455-4eb2-adf3-6e8d75e9eed4",
+            "storeDialogId": "c08ad9a4-2017-4705-b5d0-14dc3b84a5fe",
             "intellixTrust": [
                 "Green",
                 "Yellow"
