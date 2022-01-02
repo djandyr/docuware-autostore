@@ -87,7 +87,7 @@ polly()
   });
 
 /**
- * Do documents which match one or more allowed intellix trusts?
+ * Do documents match allowed intellix trusts (intelligent indexing scores)?
  * 
  * If intellix trust matches then allow
  * If no intellix trusts are defined via configuration allow all by default
