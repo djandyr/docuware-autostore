@@ -94,7 +94,7 @@ npm run start -- --config ./other/config.json
 > 
 >    See https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
 > 
-> * __autoStore.documentFilters__    
+> * __autoStore.documentFilter__    
 >    
 >    Filter source documents by boolean matching from file cabinet via glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
 >    
@@ -106,14 +106,14 @@ npm run start -- --config ./other/config.json
 >    
 >   Example configuration to filter documents where title contains partial strings;
 >
->    ```
->        "documentFilter": [
->            {
->                "name": "title", 
->                "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
->            }
->        ],
->    ```       
+>   ```
+>   [
+>       {
+>           "name": "title", 
+>           "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
+>       }
+>   ]
+>   ```       
 > 
 >    Only `title` filter is supported currently
 > 
