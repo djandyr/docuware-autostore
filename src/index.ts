@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import * as DWRest from "./types/DW_Rest";
 import * as fs from 'fs';
 import yargs from 'yargs'
+import { Console } from "console";
 
 const argv = yargs(process.argv.slice(2))
   .option("config", {
@@ -16,7 +17,7 @@ const argv = yargs(process.argv.slice(2))
 const config: IConfig = JSON.parse(fs.readFileSync(argv.config, 'utf8'));
 
 // Docuware REST API Wrapper
-const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443);
+const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
 const logonModel: DWRest.ILogonModel = restApi.CreateLogonModel(
   config.user,
   config.password,
@@ -48,7 +49,6 @@ polly()
       const fileCabinet: DWRest.IFileCabinet = await restApi.GetFileCabinet(task.fileCabinetID);
       const documentTray: DWRest.IFileCabinet = await restApi.GetFileCabinet(task.documentTrayID);
       const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, task.limit);
-      const documentIds: number[] = [];
 
       console.log(chalk.whiteBright("\t> Document Tray:"), chalk.white(`${documentTray.Name} (Id: ${documentTray.Id})`));
       console.log(chalk.whiteBright("\t> File Cabinet:"), chalk.white(`${fileCabinet.Name} (Id: ${fileCabinet.Id})`));
@@ -61,24 +61,25 @@ polly()
         console.log(chalk.whiteBright("\t> Document Title Mask:"), chalk.white(task.documentTitleMask));
       }
 
+      const documentIds: number[] = [];
       documentsFromTray.Items.forEach(doc => {
         if (
-          isIntellixTrustAllowed(doc, task.intellixTrust ?? [])
-          && isDocumentTitleMaskAllowed(doc, task.documentTitleMask ?? '')
-          && doc.Id) {
+          isIntellixTrustAllowed(doc, task.intellixTrust ?? []) &&
+          isDocumentTitleMaskAllowed(doc, task.documentTitleMask ?? '') &&
+          doc.Id) {
           documentIds.push(doc.Id)
         }
       });
 
-      const documentsQueryResult = await transferDocumentsFromDocumentTrayToFileCabinet(
+      await transferDocumentsFromDocumentTrayToFileCabinet(
         documentTray,
         fileCabinet,
         documentIds,
-        task.keepSource
+        task.keepSource,
+        task.storeDialogId
       );
 
-      const processedCount = JSON.parse(JSON.stringify(documentsQueryResult.Count));
-      console.log(chalk.green(`\t> Stored ${chalk.green(processedCount.Value)} documents`));
+      console.log(chalk.green(`\t> Stored ${chalk.green(documentIds.length)} documents`));
       });
   })
   .catch((error: Error) => {
@@ -134,14 +135,16 @@ async function transferDocumentsFromDocumentTrayToFileCabinet(
   documentTray: DWRest.IFileCabinet,
   fileCabinet: DWRest.IFileCabinet,
   docIdsToTransfer: number[],
-  keepSource:boolean
+  keepSource:boolean,
+  storeDialogId?: string
 ) {
   const documentsQueryResult: DWRest.IDocumentsQueryResult =
     await restApi.TransferFromDocumentTrayToFileCabinet(
       docIdsToTransfer,
       documentTray.Id,
       fileCabinet,
-      keepSource
+      keepSource,
+      storeDialogId
     );
 
   return documentsQueryResult

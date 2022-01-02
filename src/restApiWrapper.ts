@@ -3,6 +3,7 @@ import { DWRequestPromiseExtension } from "./types/DW_Request_Promise_Extension"
 import * as DWRest from "./types/DW_Rest";
 import http from "http";
 import https from "https";
+import { exit } from "process";
 
 /**
  * Wrapper for DocuWare REST API
@@ -12,12 +13,12 @@ import https from "https";
 class RestApiWrapper {
   platformRoot: string;
   docuWare_request_config: RequestPromiseOptions;
-  constructor(rootOfPlatform: string, port?: number | undefined) {
+  constructor(rootOfPlatform: string, port?: number | undefined, timeout?: number) {
     this.platformRoot = port ? `${rootOfPlatform}:${port}` : rootOfPlatform;
     this.docuWare_request_config = {
       baseUrl: rootOfPlatform,
       port,
-      timeout: 1000,
+      timeout: timeout ?? 1000,
       headers: {
         Accept: "application/json",
         "User-Agent": "Ingot CLI",
@@ -133,16 +134,22 @@ class RestApiWrapper {
     docIds: number[],
     basketId: string,
     fileCabinet: DWRest.IFileCabinet,
-    keepSource: boolean
+    keepSource: boolean,
+    storeDialogId?: string
   ): Promise<DWRest.IDocumentsQueryResult> {
     const fcTransferInfo: DWRest.IFileCabinetTransferInfo = {
       KeepSource: keepSource,
       SourceDocId: docIds,
       SourceFileCabinetId: basketId,
-      FillIntellix: true,
+      FillIntellix: true
     };
 
-    const transferLink: string = this.GetLink(fileCabinet, "transfer");
+    let transferLink: string = this.GetLink(fileCabinet, "transfer");
+
+    // Use a specific store dialog, as API fails to determine default store dialog leaving expected intelligent indexes blank
+    if (storeDialogId) {
+      transferLink += `?StoreDialogId=${storeDialogId}`;
+    }
 
     return request
       .post(transferLink, {
@@ -152,8 +159,7 @@ class RestApiWrapper {
           "Content-Type":
             DWRest.DocuWareSpecificContentType.FileCabinetTransferInfoJson,
         },
-      })
-      .promise();
+      }).promise();
   }
 
   /**

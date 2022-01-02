@@ -82,6 +82,10 @@ npm run start -- --config ./other/config.json
 > * __autoStore.documentTrayID__
 > 
 >     DocuWare document tray GUID, also know as web basket. GUID is usually prefixed with `b_`
+>
+> * __autoStore.storeDialogId_
+> 
+>     Store Dialog GUID. Forcing specific store dialog maybe required as DocuWare API fails to determine default store dialog leaving intelligent indexes blank
 > 
 > * __autoStore.intellixTrust__    
 > 
