@@ -13,7 +13,7 @@ import { exit } from "process";
 class RestApiWrapper {
   platformRoot: string;
   docuWare_request_config: RequestPromiseOptions;
-  constructor(rootOfPlatform: string, port?: number | undefined, timeout?: number) {
+  constructor(rootOfPlatform: string, port?: number, timeout?: number) {
     this.platformRoot = port ? `${rootOfPlatform}:${port}` : rootOfPlatform;
     this.docuWare_request_config = {
       baseUrl: rootOfPlatform,
@@ -146,7 +146,8 @@ class RestApiWrapper {
 
     let transferLink: string = this.GetLink(fileCabinet, "transfer");
 
-    // Use a specific store dialog, as API fails to determine default store dialog leaving expected intelligent indexes blank
+    // Force store dialog 
+    // DocuWare API fails to determine default store dialog transferring documents to file cabinet without pre-filled intelligent index values
     if (storeDialogId) {
       transferLink += `?StoreDialogId=${storeDialogId}`;
     }

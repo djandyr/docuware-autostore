@@ -79,7 +79,7 @@ polly()
         task.storeDialogId
       );
 
-      console.log(chalk.green(`\t> Stored ${chalk.green(documentIds.length)} documents`));
+      console.log(chalk.green(`\t> Stored ${chalk.green(documentIds.length)} documents\n`));
       });
   })
   .catch((error: Error) => {
