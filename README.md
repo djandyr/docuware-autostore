@@ -92,7 +92,7 @@ npm run start -- --config ./other/config.json
 > 
 >    List of allowed intellix trusts for autostore task. A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
 > 
->    See https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
+>    @see https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
 > 
 > * __autoStore.documentFilter__    
 >    
