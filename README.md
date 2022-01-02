@@ -102,6 +102,6 @@ npm run start -- --config ./other/config.json
 > 
 >     Whether document should be deleted from document tray after storing
 > 
-> * __autoStore.fileCabinetLimit__ 
+> * __autoStore.limit__ 
 > 
 >     Limit the number of files returned from document tray for processing
