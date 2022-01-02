@@ -94,9 +94,28 @@ npm run start -- --config ./other/config.json
 > 
 >    See https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
 > 
-> * __autoStore.documentTitleMask__    
+> * __autoStore.documentFilters__    
+>    
+>    Filter source documents by boolean matching from file cabinet via glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
+>    
+>    * name {String}: Name of predefined filter
+>    * pattern {String|Array}: One or more glob patterns to use for matching.
+>    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
+>
+>   @see https://github.com/micromatch/micromatch
+>    
+>   Example configuration to filter documents where title contains partial strings;
+>
+>    ```
+>        "documentFilter": [
+>            {
+>                "name": "title", 
+>                "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
+>            }
+>        ],
+>    ```       
 > 
->     If regular expression pattern is supplied, a search for a match is performed on source document title property. If true the source document will be stored to file cabinet, otherwise source document will be ignored.
+>    Only `title` filter is supported currently
 > 
 > * __autoStore.keepSource__    
 > 

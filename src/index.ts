@@ -1,11 +1,11 @@
 import { RestApiWrapper } from "./restApiWrapper";
-import { IConfig, IAutoStoreConfig } from "./types/Config";
+import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
 import polly from "polly-js";
 import chalk from 'chalk';
 import * as DWRest from "./types/DW_Rest";
 import * as fs from 'fs';
 import yargs from 'yargs'
-import { Console } from "console";
+import * as micromatch from 'micromatch';
 
 const argv = yargs(process.argv.slice(2))
   .option("config", {
@@ -55,15 +55,11 @@ polly()
       console.log(chalk.whiteBright("\t> File Cabinet:"), chalk.white(`${fileCabinet.Name} (Id: ${fileCabinet.Id})`));
       console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrustFromConfig(task).join(',')));
 
-      if(task.documentTitleMask) {
-        console.log(chalk.whiteBright("\t> Document Title Mask:"), chalk.white(task.documentTitleMask));
-      }
-
       const documentIds: number[] = [];
       documentsFromTray.Items.forEach(doc => {
         if (
           isDocumentIntellixTrustAllowed(doc, getAllowedIntellixTrustFromConfig(task)) &&
-          isDocumentTitleMaskAllowed(doc, task.documentTitleMask ?? '') &&
+          isDocumentFilterMatch(doc, task.documentFilter ?? []) &&
           doc.Id) {
           documentIds.push(doc.Id)
         }
@@ -99,7 +95,7 @@ function getAllowedIntellixTrustFromConfig(config:IAutoStoreConfig)  {
 }
 
 /**
- * Is documents intellix trust allowed to be stored?
+ * Is document intellix trust allowed to be stored?
  * 
  * Failed	    - Intelix failed
  * Green      - Recognized
@@ -117,18 +113,21 @@ function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrus
 }
 
 /**
- * Do documents match filename mask?
+ * Document filter match?
+ * 
+ * Returns true if any of the given filter glob patterns match the specified document property string.
+ * @see https://github.com/micromatch/micromatch
  * 
  * @param document 
- * @param mask Regex Expression Pattern
- * @returns 
+ * @param filters
  */
-function isDocumentTitleMaskAllowed(document: DWRest.IDocument, mask: string) {
-  if(document.Title && mask !== '') {
-    let re = new RegExp(mask);
-    return re.test(document.Title);
+function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
+  const filterGuard = (filter:IAutoStoreConfigFilter) => {
+    if(filter.name === 'title') {
+      return micromatch.isMatch(document.Title ?? '', filter.pattern, filter.options);
+    }
   }
-  return true;
+  return filters.every(filterGuard);
 }
 
 /**
