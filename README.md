@@ -4,6 +4,8 @@ Automatically store documents from document tray to file cabinet using DocuWare 
 
 This script addresses lack of automation within DocuWare cloud that forces logged in user to manually store each document in their tray, even if the intelligent indexing confidence score is high (green). For scenarios where DocuWare is used to intelligently index large volumes of archived documents or emails any manual intervention can quickly become unmaintainable.
 
+![DocuWare AutoStore](docuware-autostore.png)
+
 ## Install
 
 Install Node Packages
