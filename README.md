@@ -37,7 +37,7 @@ npm run start -- --config ./other/config.json
 ```
 {
     "rootUrl": "https://my.docuware.cloud/",
-    "user": "andy.roberts@warrant-group.com",
+    "user": "myusername,
     "password": "yourpassword",
     "hostID": "7b5ed19b-bfd6-46e9-8a3b-efd2a4499666",
     "autoStore": [
