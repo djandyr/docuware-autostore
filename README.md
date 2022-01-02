@@ -91,9 +91,9 @@ npm run start -- --config ./other/config.json
 > 
 > * __autoStore.intellixTrust__    
 > 
->    List of allowed intellix trusts for autostore task. Documents will be stored by matching to intellix trust assigned to document. If no allowed intellix trusts are configured only "Green" is allowed by default.
+>    List of allowed intellix trusts for autostore task. A Document will be only be stored if `Document.IntellixTrust` property is included in allowed intellix trust configuration. If intellix trusts are configured only "Green" is allowed by default.
 > 
->    See https://developer.docuware.com/sdk/platform-fox/html/T_DocuWare_Platform_ServerClient_IntellixTrust.htm
+>    See https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
 > 
 > * __autoStore.documentTitleMask__    
 > 
