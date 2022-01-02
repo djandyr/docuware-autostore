@@ -10,7 +10,7 @@ export interface IConfig {
 export interface IAutoStoreConfig {
     fileCabinetID: string,
     documentTrayID: string,
-    storeDialogId: string,
+    storeDialogID: string,
     intellixTrust: string[],
     documentTitleMask: string,
     keepSource: boolean,

@@ -46,7 +46,7 @@ npm run start -- --config ./other/config.json
         {
             "fileCabinetID": "c74e4dbb-51ec-4594-a74d-125a9af52b66",
             "documentTrayID": "b_243312da-a455-4eb2-adf3-6e8d75e9eed4",
-            "storeDialogId": "c08ad9a4-2017-4705-b5d0-14dc3b84a5fe",
+            "storeDialogID": "c08ad9a4-2017-4705-b5d0-14dc3b84a5fe",
             "intellixTrust": [
                 "Green",
                 "Yellow"
@@ -84,7 +84,7 @@ npm run start -- --config ./other/config.json
 > 
 >     DocuWare document tray GUID, also know as web basket. GUID is usually prefixed with `b_`
 >
-> * __autoStore.storeDialogId__
+> * __autoStore.storeDialogID__
 > 
 >     Store Dialog GUID. Store dialog maybe required if intelligent indexes are not pre-filled when transferring to file cabinet
 > 

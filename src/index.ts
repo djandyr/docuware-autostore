@@ -74,7 +74,7 @@ polly()
         fileCabinet,
         documentIds,
         task.keepSource,
-        task.storeDialogId
+        task.storeDialogID
       );
 
       console.log(chalk.green(`\t> Stored ${chalk.green(documentIds.length)} documents\n`));
