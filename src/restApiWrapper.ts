@@ -147,7 +147,8 @@ class RestApiWrapper {
     let transferLink: string = this.GetLink(fileCabinet, "transfer");
 
     // Force store dialog 
-    // DocuWare API fails to determine default store dialog transferring documents to file cabinet without pre-filled intelligent index values
+    // DocuWare API fails to determine default store dialog, transferring documents to file cabinet without pre-filled intelligent index values
+    // UseDefaultDialog appears to be ignored, and not included in TS interfaces
     if (storeDialogId) {
       transferLink += `?StoreDialogId=${storeDialogId}`;
     }

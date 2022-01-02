@@ -66,15 +66,16 @@ npm run start -- --config ./other/config.json
 > 
 > * __username__
 > 
->     Username of fully licensed DocuWare user
+>     Username of full licensed DocuWare cloud user
 > 
 > * __password__
 > 
->    Password of fully licensed DocuWare user    
+>    Password of full licensed DocuWare cloud user    
 > 
 > * __hostID__
 > 
->     Sets unique identifier for the machine the client is running on.
+>     Unique host identifier for the machine is required
+>     Host identifier is used by the DocuWare license management for faster reuse licenses for users working on the same machine.
 > 
 > * __autoStore.fileCabinetID__
 > 
@@ -96,11 +97,11 @@ npm run start -- --config ./other/config.json
 > 
 > * __autoStore.documentTitleMask__    
 > 
->     Regular expression pattern on document title which can include/exclude documents from file cabinet
+>     If regular expression pattern is supplied, a search for a match is performed on source document title property. If true the source document will be stored to file cabinet, otherwise source document will be ignored.
 > 
 > * __autoStore.keepSource__    
 > 
->     Whether document should be deleted from document tray after storing
+>     If this flag is true the source documents remain in the document tray; otherwise they are removed from document tray
 > 
 > * __autoStore.limit__ 
 > 
