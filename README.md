@@ -74,7 +74,7 @@ npm run start -- --config ./other/config.json
 > 
 > * __hostID__
 > 
->     Sets unique identifier of the machine the client is running.
+>     Sets unique identifier for the machine the client is running on.
 > 
 > * __autoStore.fileCabinetID__
 > 
