@@ -74,8 +74,7 @@ npm run start -- --config ./other/config.json
 > 
 > * __hostID__
 > 
->     Unique host identifier for the machine is required
->     Host identifier is used by the DocuWare license management for faster reuse licenses for users working on the same machine.
+>     Unique host identifier for the machine is required. This is used by the DocuWare license management for faster reuse licenses for users working on the same machine.
 > 
 > * __autoStore.fileCabinetID__
 > 
