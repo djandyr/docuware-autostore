@@ -99,7 +99,7 @@ npm run start -- --dry-run
 
    List of allowed [intellix trusts](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html). A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
 
-* __autoStore.documentFilter__    
+* __autoStore.filter__    
    
    Filter source documents with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
    

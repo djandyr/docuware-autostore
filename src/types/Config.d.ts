@@ -12,7 +12,8 @@ export interface IAutoStoreConfig {
     documentTrayID: string,
     storeDialogID: string,
     intellixTrust: string[],
-    documentFilter: [],
+    filters: [],
+    fields: [],
     keepSource: boolean,
     limit: number
 }

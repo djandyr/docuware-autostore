@@ -165,6 +165,22 @@ class RestApiWrapper {
   }
 
   /**
+   * Get suggestion fields
+   *
+   * @param {DWRest.IDocument} document
+   * @returns {Promise<DWRest.IDocumentSuggestionsField>}
+   */
+  GetSuggestionFields(
+      document: DWRest.IDocument,
+    ): Promise<DWRest.IDocumentSuggestionsField> {
+      const suggestionLink: string = this.GetLink(document, "suggestions");
+  
+      return request
+        .get(suggestionLink, this.docuWare_request_config)
+        .promise();
+    }
+
+  /**
    * Helper function for preparing the logon
    *
    * @param {string} user

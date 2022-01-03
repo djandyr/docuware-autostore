@@ -58,18 +58,20 @@ polly()
       const documents = await getDocuments(documentTray, config);
 
       if(args['dry-run']) {
-        documents.forEach(doc => {
+        documents.forEach(async doc => {
           console.log(`\t> ID:${doc.Id} Title:${doc.Title} IntellixTrust:${doc.IntellixTrust}`);
-        })
-      }
 
-      if(false === args["dry-run"]) {
+          if(config.fields) {
+            console.log(await restApi.GetSuggestionFields(documents[0]));
+          }
+
+        })
+      }else{
         await transferDocuments(
           documentTray,
           fileCabinet,
-          documents.map(doc => doc.Id ?? 0),
-          config.keepSource,
-          config.storeDialogID
+          documents,
+          config
         );
       }
 
@@ -91,17 +93,21 @@ polly()
 async function transferDocuments(
   documentTray: DWRest.IFileCabinet,
   fileCabinet: DWRest.IFileCabinet,
-  docIdsToTransfer: number[],
-  keepSource:boolean,
-  storeDialogId?: string
+  documents: DWRest.IDocument[],
+  config: IAutoStoreConfig
 ) {
+
+  if(config.fields) {
+    console.log(restApi.GetSuggestionFields(documents[0]));
+  }
+
   const documentsQueryResult: DWRest.IDocumentsQueryResult =
     await restApi.TransferFromDocumentTrayToFileCabinet(
-      docIdsToTransfer,
+      documents.map(doc => doc.Id ?? 0),
       documentTray.Id,
       fileCabinet,
-      keepSource,
-      storeDialogId
+      config.keepSource,
+      config.storeDialogID
     );
 
   return documentsQueryResult
@@ -122,7 +128,7 @@ async function getDocuments(
   const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? configDefaults.limit);
   return documentsFromTray.Items.filter(doc => 
     isDocumentIntellixTrustAllowed(doc, getAllowedIntellixTrust(config)) && 
-    isDocumentFilterMatch(doc, config.documentFilter ?? [])
+    isDocumentFilterMatch(doc, config.filters ?? [])
   );
 }
 

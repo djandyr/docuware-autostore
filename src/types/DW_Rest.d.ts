@@ -1492,3 +1492,26 @@ const enum DocuWareSpecificContentType {
   Unknown = "unknown",
 }
 // }
+
+/**
+ * DocuWare DocumentSuggesstionField Model
+ *
+ * @export
+ * @interface IDocumentSuggestion
+ * @extends {IDocumentIndexFieldValueBase}
+ */
+ export interface IDocumentSuggestion extends IDocumentIndexFieldValueBase {
+  name: string;
+  dbName: string;
+  confidence: string;
+  value?: IFormFieldValue[];
+}
+
+/**
+ * Roles
+ *
+ * @interface IDocumentSuggestions
+ */
+ export interface IDocumentSuggestionsField {
+  Field?: IDocumentSuggestion[];
+}
