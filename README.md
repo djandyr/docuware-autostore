@@ -20,7 +20,7 @@ Compile the code so it can be run, also required if any typescript files are cha
 npx tsc
 ```
 
-Create a new config.json autostore configuration in root folder. See [Example Configuration](#configuration)
+Create a new config.json autostore configuration in root folder. See [Example Configuration](#example-configuration)
 
 Run AutoStore
 
@@ -34,7 +34,7 @@ If a different configuration file path is required
 npm run start -- --config ./other/config.json
 ```
 
-## Configuration
+### Example Configuration
 
 ```
 {
@@ -58,7 +58,7 @@ npm run start -- --config ./other/config.json
 }
 ```
 
-Explanation of configuration values;
+### Configuration Reference
 
 * __rootUrl__
 
@@ -101,19 +101,19 @@ Explanation of configuration values;
    * name {String}: Name of predefined filter
    * pattern {String|Array}: One or more glob patterns to use for matching.
    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
->
-  @see https://github.com/micromatch/micromatch
+
+   @see https://github.com/micromatch/micromatch
    
-  Example configuration to filter documents where title contains partial strings;
->
-  ```
-  [
-      {
-          "name": "title", 
-          "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
-      }
-  ]
-  ```       
+   Example configuration to filter documents where title contains partial strings;
+
+      ```
+      [
+          {
+              "name": "title", 
+              "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
+          }
+      ]
+      ```       
 
    Only `title` filter is supported currently
 
