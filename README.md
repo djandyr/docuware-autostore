@@ -20,7 +20,7 @@ Compile the code so it can be run, also required if any typescript files are cha
 npx tsc
 ```
 
-Create a new config.json autostore configuration in root folder. See [Example Configuration](#example-configuration)
+Create a new config.json autostore configuration in root folder. See [Example Configuration](#configuration)
 
 Run AutoStore
 
@@ -28,13 +28,21 @@ Run AutoStore
 npm run start --silent
 ```
 
-If a different configuration file path is required
+## Command Arguments
+
+`--config` to specify a different configuration file path other than default `./config.json`
 
 ```
 npm run start -- --config ./other/config.json
 ```
 
-### Example Configuration
+` --dry-run` option to have autostore print document details without transferring any documents to file cabinet. This option can be used for testing filter patterns, or intellix trust levels.
+
+```
+npm run start -- --dry-run
+```
+
+## Configuration
 
 ```
 {
@@ -51,8 +59,7 @@ npm run start -- --config ./other/config.json
                 "Green",
                 "Yellow"
             ],
-            "keepSource": false,
-            "limit": 50
+            "keepSource": false
         }
     ]
 }
@@ -115,4 +122,4 @@ npm run start -- --config ./other/config.json
 
 * __autoStore.limit__ 
 
-    Limit the number of files returned from document tray for processing
+    Limit the number of files returned from document tray for processing. Default set to 100
