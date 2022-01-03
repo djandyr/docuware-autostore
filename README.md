@@ -20,7 +20,7 @@ Compile the code so it can be run, also required if any typescript files are cha
 npx tsc
 ```
 
-Create a new config.json autostore configuration in root folder. See [Example Configuration](#example-configuration)
+Create a new config.json autostore configuration in root folder. See [Example Configuration](#configuration)
 
 Run AutoStore
 
@@ -28,7 +28,7 @@ Run AutoStore
 npm run start --silent
 ```
 
-### Options
+## Command Arguments
 
 `--config` to specify a different configuration file path other than default `./config.json`
 
@@ -42,7 +42,7 @@ npm run start -- --config ./other/config.json
 npm run start -- --dry-run
 ```
 
-### Example Configuration
+## Configuration
 
 ```
 {
