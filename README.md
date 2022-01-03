@@ -90,31 +90,24 @@ npm run start -- --config ./other/config.json
 
 * __autoStore.intellixTrust__    
 
-   List of allowed intellix trusts. A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
-
-   @see https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
+   List of allowed [intellix trusts](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html). A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
 
 * __autoStore.documentFilter__    
    
-   Filter source documents by boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
+   Filter source documents with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
    
-   * name {String}: Document property name (can be accessed using dot notation)
-   * pattern {String|Array}: One or more glob patterns to use for matching.
+   * name {String}: [Document property](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#properties) name (can be accessed using dot notation)
+   * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
-
-   @see https://github.com/micromatch/micromatch
-   @see https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#properties
    
    Example configuration to filter documents where [Title](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#DocuWare_Platform_ServerClient_Document_Title) contains one or more partial strings;
 
-      ```
       [
           {
               "name": "Title", 
               "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
           }
-      ]
-      ```       
+      ]  
 
 * __autoStore.keepSource__    
 
