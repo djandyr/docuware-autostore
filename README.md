@@ -58,69 +58,69 @@ npm run start -- --config ./other/config.json
 }
 ```
 
-> JSON Configuration
-> 
-> * __rootUrl__
-> 
->     Root URL of your DocuWare cloud instance
-> 
-> * __username__
-> 
->     Username of full licensed DocuWare cloud user
-> 
-> * __password__
-> 
->    Password of full licensed DocuWare cloud user    
-> 
-> * __hostID__
-> 
->     Unique host identifier for the machine is required. This is used by the DocuWare license management around the faster reuse of licenses of users working on the same machine.
-> 
-> * __autoStore.fileCabinetID__
-> 
->     DocuWare file cabinet GUID
-> 
-> * __autoStore.documentTrayID__
-> 
->     DocuWare document tray GUID, also know as web basket. GUID is usually prefixed with `b_`
+Explanation of configuration values;
+
+* __rootUrl__
+
+    Root URL of your DocuWare cloud instance
+
+* __username__
+
+    Username of full licensed DocuWare cloud user
+
+* __password__
+
+   Password of full licensed DocuWare cloud user    
+
+* __hostID__
+
+    Unique host identifier for the machine is required. This is used by the DocuWare license management around the faster reuse of licenses of users working on the same machine.
+
+* __autoStore.fileCabinetID__
+
+    DocuWare file cabinet GUID
+
+* __autoStore.documentTrayID__
+
+    DocuWare document tray GUID, also know as web basket. GUID is usually prefixed with `b_`
 >
-> * __autoStore.storeDialogID__
-> 
->     Store Dialog GUID. Store dialog maybe required if intelligent indexes are not pre-filled when transferring to file cabinet
-> 
-> * __autoStore.intellixTrust__    
-> 
->    List of allowed intellix trusts. A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
-> 
->    @see https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
-> 
-> * __autoStore.documentFilter__    
->    
->    Filter source documents by boolean matching glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
->    
->    * name {String}: Name of predefined filter
->    * pattern {String|Array}: One or more glob patterns to use for matching.
->    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
+* __autoStore.storeDialogID__
+
+    Store Dialog GUID. Store dialog maybe required if intelligent indexes are not pre-filled when transferring to file cabinet
+
+* __autoStore.intellixTrust__    
+
+   List of allowed intellix trusts. A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
+
+   @see https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html
+
+* __autoStore.documentFilter__    
+   
+   Filter source documents by boolean matching glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
+   
+   * name {String}: Name of predefined filter
+   * pattern {String|Array}: One or more glob patterns to use for matching.
+   * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
 >
->   @see https://github.com/micromatch/micromatch
->    
->   Example configuration to filter documents where title contains partial strings;
+  @see https://github.com/micromatch/micromatch
+   
+  Example configuration to filter documents where title contains partial strings;
 >
->   ```
->   [
->       {
->           "name": "title", 
->           "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
->       }
->   ]
->   ```       
-> 
->    Only `title` filter is supported currently
-> 
-> * __autoStore.keepSource__    
-> 
->     If this flag is true the source documents remain in the document tray; otherwise they are removed from document tray
-> 
-> * __autoStore.limit__ 
-> 
->     Limit the number of files returned from document tray for processing
+  ```
+  [
+      {
+          "name": "title", 
+          "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
+      }
+  ]
+  ```       
+
+   Only `title` filter is supported currently
+
+* __autoStore.keepSource__    
+
+    If this flag is true the source documents remain in the document tray; otherwise they are removed from document tray
+
+* __autoStore.limit__ 
+
+    Limit the number of files returned from document tray for processing
