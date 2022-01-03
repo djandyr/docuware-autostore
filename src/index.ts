@@ -20,7 +20,6 @@ const configDefaults = {
   limit: 50
 }
 
-// Docuware REST API Wrapper
 const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
 const logonModel: DWRest.ILogonModel = restApi.CreateLogonModel(
   config.user,
@@ -71,10 +70,10 @@ polly()
 /**
  * Transfer document from tray to file cabinet
  * 
- * @param documentTray 
- * @param fileCabinet 
- * @param docIdsToTransfer 
- * @returns 
+ * @param {DWRest.IFileCabinet} documentTray 
+ * @param {DWRest.IFileCabinet} fileCabinet 
+ * @param {number[]} docIdsToTransfer 
+ * @returns {DWRest.DocumentsTransferResult}
  */
 async function transferDocuments(
   documentTray: DWRest.IFileCabinet,
@@ -97,13 +96,11 @@ async function transferDocuments(
 
 /**
  * Get documents from tray
+ * Returns array of first x documents in tray filtered by allowed values
  * 
- * Filter documents by allowed intellix trusts, and document filters
- * Limit x documents from tray
- * 
- * @param documentTray 
- * @param limit 
- * @returns 
+ * @param {DWRest.IFileCabinet} documentTray 
+ * @param {IAutoStoreConfig} config 
+ * @returns {DWRest.IDocument[]}
  */
 async function getDocuments(
   documentTray: DWRest.IFileCabinet,
@@ -119,26 +116,20 @@ async function getDocuments(
 /**
  * Get allowed intellix trusts from configuration
  * 
- * @param config
- * @returns 
+ * @param {IAutoStoreConfig} config
+ * @returns {string[]} Array of allowed intellix trusts
  */ 
  function getAllowedIntellixTrust(config:IAutoStoreConfig)  {
   return config.intellixTrust ?? configDefaults.intellixTrusts;
 }
 
 /**
-* Is document intellix trust allowed to be stored?
+* Is document intellix trust allowed?
+* Returns true if document intellix trust matches any of the allowed intellix trusts maintained in config
 * 
-* Failed	    - Intelix failed
-* Green      - Recognized
-* InProgress	- Intelix still in progress
-* None	      - No intelix
-* Red	      - Unrecognized
-* Yellow	    - Predicted
-* 
-* @param document
-* @param config 
-* @returns 
+* @param {DWRest.IDocument} document
+* @param {string[]} intellixTrust Array of allowed intellix trusts
+* @returns {boolean}
 */
 function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
   return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
@@ -146,12 +137,13 @@ function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrus
 
 /**
 * Document filter match?
-* 
 * Returns true if any of the given filter glob patterns match the specified document property string.
+
 * @see https://github.com/micromatch/micromatch
 * 
-* @param document 
-* @param filters
+* @param {DWRest.IDocument} document 
+* @param {IAutoStoreConfigFilter[]} filters
+* @returns {boolean}
 */
 function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
   const filterGuard = (filter:IAutoStoreConfigFilter) => {
