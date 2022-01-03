@@ -7,17 +7,24 @@ import yargs from 'yargs'
 import { RestApiWrapper } from "./restApiWrapper";
 import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
 
-const argv = yargs(process.argv.slice(2))
+const options = yargs(process.argv.slice(2))
   .option("config", {
     alias: "c",
     default: "./config.json",
     describe: "Config file path"
-  }).parse();
+  })
+  .boolean("dry-run")
+  .alias("d", "dry-run")
+  .default("dry-run", false)
+  .boolean("verbose")
+  .alias("v", "verbose")
+  .default("verbose", false)
+  .parse();
 
-const config: IConfig = JSON.parse(fs.readFileSync(argv.config, 'utf8'));
+const config: IConfig = JSON.parse(fs.readFileSync(options.config, 'utf8'));
 const configDefaults = {
   intellixTrusts: ["Green"],
-  limit: 50
+  limit: 100
 }
 
 const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
@@ -52,13 +59,22 @@ polly()
       console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config).join(',')));
 
       const documents = await getDocuments(documentTray, config);
-      await transferDocuments(
-        documentTray,
-        fileCabinet,
-        documents.map(doc => doc.Id ?? 0),
-        config.keepSource,
-        config.storeDialogID
-      );
+      
+      if(options.verbose) {
+        documents.forEach(doc => {
+          console.log(`\t> ID:${doc.Id} Title:${doc.Title} IntellixTrust:${doc.IntellixTrust}`);
+        })
+      }
+
+      if(false === options["dry-run"]) {
+        await transferDocuments(
+          documentTray,
+          fileCabinet,
+          documents.map(doc => doc.Id ?? 0),
+          config.keepSource,
+          config.storeDialogID
+        );
+      }
 
       console.log(chalk.green(`\t> Stored ${chalk.green(documents.length)} documents\n`));
       });
@@ -132,7 +148,7 @@ async function getDocuments(
 * @returns {boolean}
 */
 function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
-  return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
+  return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '');
 }
 
 /**
@@ -145,19 +161,16 @@ function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrus
 * @returns {boolean}
 */
 function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
-
-  // Get property value from document by dot notation
-  const getter = (property:string, obj:DWRest.IDocument) => {
+  // Get document property value by dot notation
+  const documentAccessor = (property:string, obj:DWRest.IDocument) => {
     return property.split('.').reduce((obj:any, i) => {
         return obj[i];
     }, obj);
   };
 
-  const filterGuard = (filter:IAutoStoreConfigFilter) => {
-      return micromatch.isMatch(getter(filter.name, document), filter.pattern, filter.options);
-  }
-
-  return filters.every(filterGuard);
+  return filters.every((filter:IAutoStoreConfigFilter) => {
+    return micromatch.isMatch(documentAccessor(filter.name, document), filter.pattern, filter.options);
+  });
 }
 
 /**
