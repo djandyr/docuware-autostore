@@ -60,10 +60,8 @@ polly()
       if(args['dry-run']) {
         documents.forEach(doc => {
           console.log(`\t> ID:${doc.Id} Title:${doc.Title} IntellixTrust:${doc.IntellixTrust}`);
-        })
-      }
-
-      if(false === args["dry-run"]) {
+        });
+      }else{
         await transferDocuments(
           documentTray,
           fileCabinet,
@@ -74,7 +72,7 @@ polly()
       }
 
       console.log(chalk.green(`\t> Stored ${chalk.green(documents.length)} documents\n`));
-      });
+    });
   })
   .catch((error: Error) => {
     traceError(error);
