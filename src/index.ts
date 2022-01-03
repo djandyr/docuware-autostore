@@ -111,7 +111,7 @@ async function getDocuments(
 ) {
   const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? configDefaults.limit);
   return documentsFromTray.Items.filter(doc => 
-    getAllowedIntellixTrust(config) && 
+    isDocumentIntellixTrustAllowed(doc, getAllowedIntellixTrust(config)) && 
     isDocumentFilterMatch(doc, config.documentFilter ?? [])
   );
 }
