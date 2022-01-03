@@ -102,14 +102,12 @@ npm run start -- --config ./other/config.json
    
    Example configuration to filter documents where [Title](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#DocuWare_Platform_ServerClient_Document_Title) contains one or more partial strings;
 
-      ```
       [
           {
               "name": "Title", 
               "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
           }
-      ]
-      ```       
+      ]  
 
 * __autoStore.keepSource__    
 
