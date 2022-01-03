@@ -28,10 +28,18 @@ Run AutoStore
 npm run start --silent
 ```
 
-If a different configuration file path is required
+### Options
+
+`--config` to specify a different configuration file path other than default `./config.json`
 
 ```
 npm run start -- --config ./other/config.json
+```
+
+` --dry-run` option to have autostore print document details without transferring any documents to file cabinet. This option can be used for testing filter patterns, or intellix trust levels.
+
+```
+npm run start -- --dry-run
 ```
 
 ### Example Configuration
@@ -51,8 +59,7 @@ npm run start -- --config ./other/config.json
                 "Green",
                 "Yellow"
             ],
-            "keepSource": false,
-            "limit": 50
+            "keepSource": false
         }
     ]
 }
@@ -115,4 +122,4 @@ npm run start -- --config ./other/config.json
 
 * __autoStore.limit__ 
 
-    Limit the number of files returned from document tray for processing
+    Limit the number of files returned from document tray for processing. Default set to 100
