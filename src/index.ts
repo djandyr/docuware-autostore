@@ -1,11 +1,11 @@
-import { RestApiWrapper } from "./restApiWrapper";
-import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
-import polly from "polly-js";
-import chalk from 'chalk';
 import * as DWRest from "./types/DW_Rest";
 import * as fs from 'fs';
-import yargs from 'yargs'
 import * as micromatch from 'micromatch';
+import polly from "polly-js";
+import chalk from 'chalk';
+import yargs from 'yargs'
+import { RestApiWrapper } from "./restApiWrapper";
+import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
 
 const argv = yargs(process.argv.slice(2))
   .option("config", {
@@ -141,7 +141,7 @@ async function getDocuments(
 * @returns 
 */
 function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
-return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
+  return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
 }
 
 /**
@@ -154,12 +154,12 @@ return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : 
 * @param filters
 */
 function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
-const filterGuard = (filter:IAutoStoreConfigFilter) => {
-  if(filter.name === 'title') {
-    return micromatch.isMatch(document.Title ?? '', filter.pattern, filter.options);
+  const filterGuard = (filter:IAutoStoreConfigFilter) => {
+    if(filter.name === 'title') {
+      return micromatch.isMatch(document.Title ?? '', filter.pattern, filter.options);
+    }
   }
-}
-return filters.every(filterGuard);
+  return filters.every(filterGuard);
 }
 
 /**
