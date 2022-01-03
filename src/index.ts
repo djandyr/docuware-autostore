@@ -15,7 +15,10 @@ const argv = yargs(process.argv.slice(2))
   }).parse();
 
 const config: IConfig = JSON.parse(fs.readFileSync(argv.config, 'utf8'));
-const defaultIntellixTrusts:string[] = ["Green"]; // Only allow "Green" intellix trust if not configured
+const configDefaults = {
+  intellixTrusts: ["Green"],
+  limit: 50
+}
 
 // Docuware REST API Wrapper
 const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
@@ -40,95 +43,30 @@ polly()
     console.log(chalk.whiteBright("Username:"), chalk.white(logonModel.Username));
     console.log(chalk.whiteBright("Organization:"), chalk.white(organization.Name));
 
-    config.autoStore.forEach(async (task, index) => {
-      console.log(
-        chalk.yellow(
-          `\nTask ${index+1}:`,
-        )
-      );
+    config.autoStore.forEach(async (config, index) => {
+      const fileCabinet: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.fileCabinetID);
+      const documentTray: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.documentTrayID);
 
-      const fileCabinet: DWRest.IFileCabinet = await restApi.GetFileCabinet(task.fileCabinetID);
-      const documentTray: DWRest.IFileCabinet = await restApi.GetFileCabinet(task.documentTrayID);
-      const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, task.limit);
-
+      console.log(chalk.yellow(`\nTask ${index+1}:`));
       console.log(chalk.whiteBright("\t> Document Tray:"), chalk.white(`${documentTray.Name} (Id: ${documentTray.Id})`));
       console.log(chalk.whiteBright("\t> File Cabinet:"), chalk.white(`${fileCabinet.Name} (Id: ${fileCabinet.Id})`));
-      console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrustFromConfig(task).join(',')));
+      console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config).join(',')));
 
-      const documentIds: number[] = [];
-      documentsFromTray.Items.forEach(doc => {
-        if (
-          isDocumentIntellixTrustAllowed(doc, getAllowedIntellixTrustFromConfig(task)) &&
-          isDocumentFilterMatch(doc, task.documentFilter ?? []) &&
-          doc.Id) {
-          documentIds.push(doc.Id)
-        }
-      });
-
-      await transferDocumentsFromDocumentTrayToFileCabinet(
+      const documents = await getDocuments(documentTray, config);
+      await transferDocuments(
         documentTray,
         fileCabinet,
-        documentIds,
-        task.keepSource,
-        task.storeDialogID
+        documents.map(doc => doc.Id ?? 0),
+        config.keepSource,
+        config.storeDialogID
       );
 
-      console.log(chalk.green(`\t> Stored ${chalk.green(documentIds.length)} documents\n`));
+      console.log(chalk.green(`\t> Stored ${chalk.green(documents.length)} documents\n`));
       });
   })
   .catch((error: Error) => {
     traceError(error);
   });
-
-/**
- * Get allowed intellix trusts from configuration
- * 
- * @param config
- * @returns 
- */ 
-function getAllowedIntellixTrustFromConfig(config:IAutoStoreConfig)  {
-    if(!config.intellixTrust) {
-      return defaultIntellixTrusts;
-    }
-
-    return config.intellixTrust;
-}
-
-/**
- * Is document intellix trust allowed to be stored?
- * 
- * Failed	    - Intelix failed
- * Green      - Recognized
- * InProgress	- Intelix still in progress
- * None	      - No intelix
- * Red	      - Unrecognized
- * Yellow	    - Predicted
- * 
- * @param document
- * @param config 
- * @returns 
- */
-function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
-  return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
-}
-
-/**
- * Document filter match?
- * 
- * Returns true if any of the given filter glob patterns match the specified document property string.
- * @see https://github.com/micromatch/micromatch
- * 
- * @param document 
- * @param filters
- */
-function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
-  const filterGuard = (filter:IAutoStoreConfigFilter) => {
-    if(filter.name === 'title') {
-      return micromatch.isMatch(document.Title ?? '', filter.pattern, filter.options);
-    }
-  }
-  return filters.every(filterGuard);
-}
 
 /**
  * Transfer document from tray to file cabinet
@@ -138,7 +76,7 @@ function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreCo
  * @param docIdsToTransfer 
  * @returns 
  */
-async function transferDocumentsFromDocumentTrayToFileCabinet(
+async function transferDocuments(
   documentTray: DWRest.IFileCabinet,
   fileCabinet: DWRest.IFileCabinet,
   docIdsToTransfer: number[],
@@ -155,6 +93,73 @@ async function transferDocumentsFromDocumentTrayToFileCabinet(
     );
 
   return documentsQueryResult
+}
+
+/**
+ * Get documents from tray
+ * 
+ * Filter documents by allowed intellix trusts, and document filters
+ * Limit x documents from tray
+ * 
+ * @param documentTray 
+ * @param limit 
+ * @returns 
+ */
+async function getDocuments(
+  documentTray: DWRest.IFileCabinet,
+  config: IAutoStoreConfig
+) {
+  const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? configDefaults.limit);
+  return documentsFromTray.Items.filter(doc => 
+    getAllowedIntellixTrust(config) && 
+    isDocumentFilterMatch(doc, config.documentFilter ?? [])
+  );
+}
+
+/**
+ * Get allowed intellix trusts from configuration
+ * 
+ * @param config
+ * @returns 
+ */ 
+ function getAllowedIntellixTrust(config:IAutoStoreConfig)  {
+  return config.intellixTrust ?? configDefaults.intellixTrusts;
+}
+
+/**
+* Is document intellix trust allowed to be stored?
+* 
+* Failed	    - Intelix failed
+* Green      - Recognized
+* InProgress	- Intelix still in progress
+* None	      - No intelix
+* Red	      - Unrecognized
+* Yellow	    - Predicted
+* 
+* @param document
+* @param config 
+* @returns 
+*/
+function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
+return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '')
+}
+
+/**
+* Document filter match?
+* 
+* Returns true if any of the given filter glob patterns match the specified document property string.
+* @see https://github.com/micromatch/micromatch
+* 
+* @param document 
+* @param filters
+*/
+function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
+const filterGuard = (filter:IAutoStoreConfigFilter) => {
+  if(filter.name === 'title') {
+    return micromatch.isMatch(document.Title ?? '', filter.pattern, filter.options);
+  }
+}
+return filters.every(filterGuard);
 }
 
 /**
