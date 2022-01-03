@@ -94,7 +94,7 @@ npm run start -- --config ./other/config.json
 
 * __autoStore.documentFilter__    
    
-   Filter source documents by boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
+   Filter source documents with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
    
    * name {String}: [Document property](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#properties) name (can be accessed using dot notation)
    * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
