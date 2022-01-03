@@ -138,7 +138,6 @@ function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrus
 /**
 * Document filter match?
 * Returns true if any of the given filter glob patterns match the specified document property string.
-
 * @see https://github.com/micromatch/micromatch
 * 
 * @param {DWRest.IDocument} document 
