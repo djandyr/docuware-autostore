@@ -145,11 +145,18 @@ function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrus
 * @returns {boolean}
 */
 function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
+
+  // Get property value from document by dot notation
+  const getter = (property:string, obj:DWRest.IDocument) => {
+    return property.split('.').reduce((obj:any, i) => {
+        return obj[i];
+    }, obj);
+  };
+
   const filterGuard = (filter:IAutoStoreConfigFilter) => {
-    if(filter.name === 'title') {
-      return micromatch.isMatch(document.Title ?? '', filter.pattern, filter.options);
-    }
+      return micromatch.isMatch(getter(filter.name, document), filter.pattern, filter.options);
   }
+
   return filters.every(filterGuard);
 }
 

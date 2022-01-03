@@ -96,26 +96,25 @@ npm run start -- --config ./other/config.json
 
 * __autoStore.documentFilter__    
    
-   Filter source documents by boolean matching glob patterns - using wildcards (*, ? and !). Each filter accepts the following parameters:
+   Filter source documents by boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
    
-   * name {String}: Name of predefined filter
+   * name {String}: Document property name (can be accessed using dot notation)
    * pattern {String|Array}: One or more glob patterns to use for matching.
    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
 
    @see https://github.com/micromatch/micromatch
+   @see https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#properties
    
-   Example configuration to filter documents where title contains partial strings;
+   Example configuration to filter documents where [Title](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#DocuWare_Platform_ServerClient_Document_Title) contains one or more partial strings;
 
       ```
       [
           {
-              "name": "title", 
+              "name": "Title", 
               "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
           }
       ]
       ```       
-
-   Only `title` filter is supported currently
 
 * __autoStore.keepSource__    
 
