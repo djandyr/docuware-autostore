@@ -3,11 +3,11 @@ import * as fs from 'fs';
 import * as micromatch from 'micromatch';
 import polly from "polly-js";
 import chalk from 'chalk';
-import yargs from 'yargs'
+import yargs, { option } from 'yargs'
 import { RestApiWrapper } from "./restApiWrapper";
 import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
 
-const options = yargs(process.argv.slice(2))
+const args = yargs(process.argv.slice(2))
   .option("config", {
     alias: "c",
     default: "./config.json",
@@ -16,12 +16,9 @@ const options = yargs(process.argv.slice(2))
   .boolean("dry-run")
   .alias("d", "dry-run")
   .default("dry-run", false)
-  .boolean("verbose")
-  .alias("v", "verbose")
-  .default("verbose", false)
   .parse();
 
-const config: IConfig = JSON.parse(fs.readFileSync(options.config, 'utf8'));
+const config: IConfig = JSON.parse(fs.readFileSync(args.config, 'utf8'));
 const configDefaults = {
   intellixTrusts: ["Green"],
   limit: 100
@@ -59,14 +56,14 @@ polly()
       console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config).join(',')));
 
       const documents = await getDocuments(documentTray, config);
-      
-      if(options.verbose) {
+
+      if(args['dry-run']) {
         documents.forEach(doc => {
           console.log(`\t> ID:${doc.Id} Title:${doc.Title} IntellixTrust:${doc.IntellixTrust}`);
         })
       }
 
-      if(false === options["dry-run"]) {
+      if(false === args["dry-run"]) {
         await transferDocuments(
           documentTray,
           fileCabinet,
