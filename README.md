@@ -46,22 +46,20 @@ npm run start -- --dry-run
 
 ```
 {
-    "rootUrl": "https://my.docuware.cloud/",
-    "user": "username",
-    "password": "password",
-    "hostID": "7b5ed19b-bfd6-46e9-8a3b-efd2a4499666",
-    "autoStore": [
-        {
-            "fileCabinetID": "c74e4dbb-51ec-4594-a74d-125a9af52b66",
-            "documentTrayID": "b_243312da-a455-4eb2-adf3-6e8d75e9eed4",
-            "storeDialogID": "c08ad9a4-2017-4705-b5d0-14dc3b84a5fe",
-            "intellixTrust": [
-                "Green",
-                "Yellow"
-            ],
-            "keepSource": false
-        }
-    ]
+	"rootUrl": "https://my.docuware.cloud/",
+	"user": "username",
+	"password": "password",
+	"hostID": "7b5ed19b-bfd6-46e9-8a3b-efd2a4499666",
+	"autoStore": [{
+		"fileCabinetID": "c74e4dbb-51ec-4594-a74d-125a9af52b66",
+		"documentTrayID": "b_243312da-a455-4eb2-adf3-6e8d75e9eed4",
+		"storeDialogID": "c08ad9a4-2017-4705-b5d0-14dc3b84a5fe",
+		"filters": [{
+			"name": "IntellixTrust",
+			"pattern": ["Green"]
+		}],
+		"keepSource": false
+	}]
 }
 ```
 
@@ -95,10 +93,6 @@ npm run start -- --dry-run
 
     Store Dialog GUID. Store dialog maybe required if intelligent indexes are not pre-filled when transferring to file cabinet
 
-* __autoStore.intellixTrust__    
-
-   List of allowed [intellix trusts](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html). A source document will be only be stored if `Document.IntellixTrust` property is included in allowed list. If configration array is omitted only "Green" is allowed by default.
-
 * __autoStore.filters__    
    
    Filter source documents with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
@@ -106,8 +100,17 @@ npm run start -- --dry-run
    * name {String}: [Document property](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#properties) name (can be accessed using dot notation)
    * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
+   ---
+   Example 1: Filter source documents by [Intellix Trust](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html) level. A source document will be only be stored if `Document.IntellixTrust` property is Green, or Yellow
+
+      [
+          {
+              "name": "IntellixTrust", 
+              "pattern": ["Green", "Yellow"]
+          }
+      ]  
    
-   Example configuration to filter documents where [Title](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#DocuWare_Platform_ServerClient_Document_Title) contains one or more partial strings;
+   Example 2: Filter source documents where [Title](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#DocuWare_Platform_ServerClient_Document_Title) contains one or more partial strings;
 
       [
           {
@@ -123,3 +126,28 @@ npm run start -- --dry-run
 * __autoStore.limit__ 
 
     Limit the number of files returned from document tray for processing. Default set to 100
+
+## FAQ
+
+__How do I find my File Cabinet ID?__
+
+1. Navigate to DocuWare Configurations > File Cabinets
+2. Click "Edit" icon on your File Cabinet
+3. Click "More Options" hyperlink
+4. Note GUID of the file cabinet
+
+__How do I find my Document Tray ID?__
+
+1. Open the following service URL from your Docuware Cloud instance in your browser `https://my.docuware.cloud/DocuWare/Platform/FileCabinets`
+2. Search for `@AssignedCabinetId="Your File Cabinet ID"`
+3. If File Cabinet `@IsBasket = "true"` and `@Id` prefixed with `_b`
+4. Note `@Id`
+
+__How do I find my Store Dialog ID?__
+
+1. Navigate to DocuWare Configuration > File Cabinets 
+2. Click "Edit" icon on your File Cabinet
+3. Select "Dialog" tab
+4. Click on the name your preferred Store Dialog
+5. Click "More Options"
+6. Note "ID"

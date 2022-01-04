@@ -5,3 +5,5 @@ dist
 .vs
 container.tar
 config.json
+.DS_Store
+*.bak
