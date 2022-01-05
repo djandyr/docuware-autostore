@@ -12,14 +12,14 @@ export interface IAutoStoreConfig {
     documentTrayID: string,
     storeDialogID: string,
     intellixTrust: string[],
-    filters: [],
-    fields: [],
+    filters: IAutoStoreConfigFilter[],
     keepSource: boolean,
-    limit: number
+    fields: [],
+    limit: number,
 }
 
 export interface IAutoStoreConfigFilter {
     name: string,
-    pattern: string,
-    options: {}
+    pattern: string|string[],
+    options?: {}
 }

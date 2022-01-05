@@ -7,6 +7,9 @@ import yargs, { option } from 'yargs'
 import { RestApiWrapper } from "./restApiWrapper";
 import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
 
+const DEFAULT_STORE_LIMIT = 100;
+const INTELLIX_TRUST_NAME = "IntellixTrust";
+
 const args = yargs(process.argv.slice(2))
   .option("config", {
     alias: "c",
@@ -18,12 +21,7 @@ const args = yargs(process.argv.slice(2))
   .default("dry-run", false)
   .parse();
 
-const config: IConfig = JSON.parse(fs.readFileSync(args.config, 'utf8'));
-const configDefaults = {
-  intellixTrusts: ["Green"],
-  limit: 100
-}
-
+const config:IConfig = loadConfiguration(args.config);  
 const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
 const logonModel: DWRest.ILogonModel = restApi.CreateLogonModel(
   config.user,
@@ -32,16 +30,13 @@ const logonModel: DWRest.ILogonModel = restApi.CreateLogonModel(
   config.hostID
 );
 
-console.log(
-  chalk.bgWhite(
-    chalk.black("Docuware Autostore\n"),
-  )
-);
+console.log(chalk.bgWhite(chalk.black("Docuware Autostore\n")));
 
 polly()
   .waitAndRetry(3)
   .executeForPromise(async () => {
     const logonResponse: DWRest.ILogonResponse = await restApi.Logon(logonModel);
+
     const organization: DWRest.IOrganization = await restApi.GetOrganization();
     console.log(chalk.whiteBright("Username:"), chalk.white(logonModel.Username));
     console.log(chalk.whiteBright("Organization:"), chalk.white(organization.Name));
@@ -53,7 +48,7 @@ polly()
       console.log(chalk.yellow(`\nTask ${index+1}:`));
       console.log(chalk.whiteBright("\t> Document Tray:"), chalk.white(`${documentTray.Name} (Id: ${documentTray.Id})`));
       console.log(chalk.whiteBright("\t> File Cabinet:"), chalk.white(`${fileCabinet.Name} (Id: ${fileCabinet.Id})`));
-      console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config).join(',')));
+      console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config)?.toString()));
 
       const documents = await getDocuments(documentTray, config);
 
@@ -76,11 +71,22 @@ polly()
       }
 
       console.log(chalk.green(`\t> Stored ${chalk.green(documents.length)} documents\n`));
-      });
+    });
   })
   .catch((error: Error) => {
     traceError(error);
   });
+
+/**
+ * Load Configuration
+ * 
+ * @param {string} filepath 
+ * @returns 
+ */
+function loadConfiguration(filepath: string) {
+  let config:IConfig = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+  return config;
+}  
 
 /**
  * Transfer document from tray to file cabinet
@@ -125,33 +131,20 @@ async function getDocuments(
   documentTray: DWRest.IFileCabinet,
   config: IAutoStoreConfig
 ) {
-  const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? configDefaults.limit);
+  const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? DEFAULT_STORE_LIMIT);
   return documentsFromTray.Items.filter(doc => 
-    isDocumentIntellixTrustAllowed(doc, getAllowedIntellixTrust(config)) && 
     isDocumentFilterMatch(doc, config.filters ?? [])
   );
 }
 
 /**
- * Get allowed intellix trusts from configuration
- * 
- * @param {IAutoStoreConfig} config
- * @returns {string[]} Array of allowed intellix trusts
- */ 
- function getAllowedIntellixTrust(config:IAutoStoreConfig)  {
-  return config.intellixTrust ?? configDefaults.intellixTrusts;
-}
-
-/**
-* Is document intellix trust allowed?
-* Returns true if document intellix trust matches any of the allowed intellix trusts maintained in config
+* Get allowed intellix trusts from filter configuration
 * 
-* @param {DWRest.IDocument} document
-* @param {string[]} intellixTrust Array of allowed intellix trusts
-* @returns {boolean}
-*/
-function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrust: string[]) {
-  return intellixTrust.includes(document.IntellixTrust ? document.IntellixTrust : '');
+* @param {IAutoStoreConfig} config
+*/ 
+function getAllowedIntellixTrust(config:IAutoStoreConfig)  {
+  let filter = config?.filters?.find(o => o['name'] === INTELLIX_TRUST_NAME);
+  return filter?.pattern;
 }
 
 /**
@@ -164,16 +157,22 @@ function isDocumentIntellixTrustAllowed(document: DWRest.IDocument, intellixTrus
 * @returns {boolean}
 */
 function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
-  // Get document property value by dot notation
-  const documentAccessor = (property:string, obj:DWRest.IDocument) => {
-    return property.split('.').reduce((obj:any, i) => {
-        return obj[i];
-    }, obj);
-  };
-
   return filters.every((filter:IAutoStoreConfigFilter) => {
-    return micromatch.isMatch(documentAccessor(filter.name, document), filter.pattern, filter.options);
+    return micromatch.isMatch(getDocumentProperty(filter.name, document), filter.pattern, filter.options);
   });
+}
+
+/**
+ * Get source document property using dot notation
+ * 
+ * @param property 
+ * @param obj 
+ * @returns 
+ */
+function getDocumentProperty(property:string, obj:DWRest.IDocument) {
+  return property.split('.').reduce((obj:any, i) => {
+    return obj[i];
+}, obj);
 }
 
 /**
