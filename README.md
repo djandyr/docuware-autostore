@@ -95,7 +95,7 @@ npm run start -- --dry-run
 
 * __autoStore.filters__    
    
-   Filter source document properties with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
+   Filter source document properties by boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
 
    > For allowed properties please see [IDocument type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
    
@@ -126,17 +126,14 @@ npm run start -- --dry-run
     Define which simple intellix field suggestions from Intelligent Indexing Service to be stored as document index value
 
    * name {String}: Field Database Name
-   * filters {Object[]}: Filter Configuration
-        > For allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
-   
-        * name {String}: Document suggestion field property
-        * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
-        * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
-   ---
+   * filters {Object[]}: Filter Configuration for allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
+   		* name {String}: Document suggestion field property
+   		* pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
+   		* [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
+  
+  ---
+  Example 1: Use only intellix suggestions fields subject and company where intellix confidence is green, or yellow
 
-   Example 1: Use only intellix suggestions fields subject and company where intellix confidence is green, or yellow
-
-    ```
         "suggestions": [
             {
                 "name": "SUBJECT",
@@ -150,9 +147,7 @@ npm run start -- --dry-run
                     "name": "Confidence", "pattern": ["Green","Yellow"]
                 }]
             }
-        ],
-
-    ```
+        ]
 
 * __autoStore.keepPreFilledIndexes__    
 
