@@ -1493,18 +1493,22 @@ const enum DocuWareSpecificContentType {
 }
 // }
 
+export interface IDocumentSuggestionFieldValue {
+  Item: any;
+  ItemElementName: ItemChoiceType;
+}
+
 /**
  * DocuWare DocumentSuggesstionField Model
  *
  * @export
  * @interface IDocumentSuggestion
- * @extends {IDocumentIndexFieldValueBase}
  */
- export interface IDocumentSuggestion extends IDocumentIndexFieldValueBase {
-  name: string;
-  dbName: string;
-  confidence: string;
-  value?: IFormFieldValue[];
+ export interface IDocumentSuggestion {
+  Name: string;
+  DBName: string;
+  Confidence: string;
+  Value: IDocumentSuggestionFieldValue[];
 }
 
 /**
@@ -1513,5 +1517,5 @@ const enum DocuWareSpecificContentType {
  * @interface IDocumentSuggestions
  */
  export interface IDocumentSuggestionsField {
-  Field?: IDocumentSuggestion[];
+  Field: IDocumentSuggestion[];
 }

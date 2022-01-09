@@ -14,8 +14,15 @@ export interface IAutoStoreConfig {
     intellixTrust: string[],
     filters: IAutoStoreConfigFilter[],
     keepSource: boolean,
-    fields: [],
+    suggestions: IAutoStoreConfigSuggestion[],
+    keepPreFilledIndexes: boolean,
     limit: number,
+}
+
+export interface IAutoStoreConfigSuggestion {
+    name: string,
+    ignore: boolean,
+    filters: IAutoStoreConfigFilter[]
 }
 
 export interface IAutoStoreConfigFilter {

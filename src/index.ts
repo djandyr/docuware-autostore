@@ -1,11 +1,12 @@
 import * as DWRest from "./types/DW_Rest";
-import * as fs from 'fs';
-import * as micromatch from 'micromatch';
+import * as fs from "fs";
+import * as micromatch from "micromatch";
 import polly from "polly-js";
-import chalk from 'chalk';
-import yargs, { option } from 'yargs'
+import chalk from "chalk";
+import yargs, { option } from "yargs"
 import { RestApiWrapper } from "./restApiWrapper";
 import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Config";
+import expr from "property-expr";
 
 const DEFAULT_STORE_LIMIT = 100;
 const INTELLIX_TRUST_NAME = "IntellixTrust";
@@ -21,7 +22,7 @@ const args = yargs(process.argv.slice(2))
   .default("dry-run", false)
   .parse();
 
-const config:IConfig = loadConfiguration(args.config);  
+const config: IConfig = loadConfiguration(args.config);
 const restApi: RestApiWrapper = new RestApiWrapper(config.rootUrl, 443, 120000);
 const logonModel: DWRest.ILogonModel = restApi.CreateLogonModel(
   config.user,
@@ -45,32 +46,45 @@ polly()
       const fileCabinet: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.fileCabinetID);
       const documentTray: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.documentTrayID);
 
-      console.log(chalk.yellow(`\nTask ${index+1}:`));
+      console.log(chalk.yellow(`\nTask ${index + 1}:`));
       console.log(chalk.whiteBright("\t> Document Tray:"), chalk.white(`${documentTray.Name} (Id: ${documentTray.Id})`));
       console.log(chalk.whiteBright("\t> File Cabinet:"), chalk.white(`${fileCabinet.Name} (Id: ${fileCabinet.Id})`));
-      console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config)?.toString()));
 
-      const documents = await getDocuments(documentTray, config);
-
-      if(args['dry-run']) {
-        documents.forEach(async doc => {
-          console.log(`\t> ID:${doc.Id} Title:${doc.Title} IntellixTrust:${doc.IntellixTrust}`);
-
-          if(config.fields) {
-            console.log(await restApi.GetSuggestionFields(documents[0]));
-          }
-
-        })
-      }else{
-        await transferDocuments(
-          documentTray,
-          fileCabinet,
-          documents,
-          config
-        );
+      if (getAllowedIntellixTrust(config)) {
+        console.log(chalk.whiteBright("\t> Intellix Trust Filter:"), chalk.white(getAllowedIntellixTrust(config)?.toString()));
       }
 
-      console.log(chalk.green(`\t> Stored ${chalk.green(documents.length)} documents\n`));
+      let docIdsToTransfer: number[] = [];
+      for await (const document of getDocuments(documentTray, config)) {
+        if (args['dry-run']) {
+          console.log(`\t> ID:${document.Id} Title:${document.Title} IntellixTrust:${document.IntellixTrust}`);
+          if (config.suggestions) {
+            let suggestions = await getSuggestionFields(document, config);
+            for (const field of suggestions) {
+              console.log(`\t\t> ${field.Name.padEnd(25)} = ${field.Value?.shift()?.Item}`);
+            };
+          }
+        } else {
+          if (config.suggestions) {
+            let suggestions = await getSuggestionFields(document, config);
+            await updateDocumentIndexValues(document, suggestions);
+          }
+
+          if (document.Id) {
+            docIdsToTransfer.push(document.Id)
+          }
+        }
+      }
+
+      await transferDocument(
+        documentTray,
+        fileCabinet,
+        docIdsToTransfer,
+        config
+      );
+
+      console.log(chalk.green(`\t> Stored ${chalk.green(docIdsToTransfer.length)} documents\n`));
+
     });
   })
   .catch((error: Error) => {
@@ -81,107 +95,178 @@ polly()
  * Load Configuration
  * 
  * @param {string} filepath 
- * @returns 
+ * @returns {object}
  */
 function loadConfiguration(filepath: string) {
-  let config:IConfig = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+  let config: IConfig = JSON.parse(fs.readFileSync(filepath, 'utf8'));
   return config;
-}  
+}
+
+/**
+ * Update document index values
+ * 
+ * @param {DWRest.IDocument} document 
+ * @param {DWRest.IDocumentSuggestion[]} suggestions
+ * @returns {Promise<DWRest.IFieldList>}
+ */
+async function updateDocumentIndexValues(
+  document: DWRest.IDocument,
+  suggestions: DWRest.IDocumentSuggestion[]) {
+  let fieldsToUpdate: DWRest.IFieldList = { Field: [] }
+  for (const field of suggestions) {
+    fieldsToUpdate.Field.push({
+      'fieldName': field.Name,
+      'item': field.Value[0].Item,
+      'itemElementName': field.Value[0].ItemElementName
+    })
+  }
+
+  return await restApi.UpdateDocumentIndexValues(document, fieldsToUpdate);
+}
 
 /**
  * Transfer document from tray to file cabinet
  * 
  * @param {DWRest.IFileCabinet} documentTray 
  * @param {DWRest.IFileCabinet} fileCabinet 
- * @param {number[]} docIdsToTransfer 
- * @returns {DWRest.DocumentsTransferResult}
+ * @param {DWRest.IDocument} document
+ * @returns {Promise<DWRest.DocumentsTransferResult>}
  */
-async function transferDocuments(
+async function transferDocument(
   documentTray: DWRest.IFileCabinet,
   fileCabinet: DWRest.IFileCabinet,
-  documents: DWRest.IDocument[],
+  docIdsToTransfer: number[],
   config: IAutoStoreConfig
 ) {
-
-  if(config.fields) {
-    console.log(restApi.GetSuggestionFields(documents[0]));
-  }
-
-  const documentsQueryResult: DWRest.IDocumentsQueryResult =
-    await restApi.TransferFromDocumentTrayToFileCabinet(
-      documents.map(doc => doc.Id ?? 0),
-      documentTray.Id,
-      fileCabinet,
-      config.keepSource,
-      config.storeDialogID
-    );
-
-  return documentsQueryResult
+  return await restApi.TransferFromDocumentTrayToFileCabinet(
+    docIdsToTransfer,
+    documentTray.Id,
+    fileCabinet,
+    config.keepSource,
+    config.storeDialogID,
+    config.suggestions ? false : true // FillIntellix
+  );
 }
 
 /**
- * Get documents from tray
- * Returns array of first x documents in tray filtered by allowed values
+ * Returns documents in tray matching defined filter rules
  * 
  * @param {DWRest.IFileCabinet} documentTray 
  * @param {IAutoStoreConfig} config 
  * @returns {DWRest.IDocument[]}
  */
-async function getDocuments(
-  documentTray: DWRest.IFileCabinet,
-  config: IAutoStoreConfig
-) {
-  const documentsFromTray = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? DEFAULT_STORE_LIMIT);
-  return documentsFromTray.Items.filter(doc => 
-    isDocumentFilterMatch(doc, config.filters ?? [])
-  );
+async function* getDocuments(documentTray: DWRest.IFileCabinet, config: IAutoStoreConfig) {
+  const pager = await pageThroughDocumentTray(documentTray, config);
+
+  for await (const documents of pager) {
+    const filteredDocuments = documents.Items.filter(doc =>
+      isFilterMatch(config.filters, doc)
+    );
+
+    for (let document of filteredDocuments) {
+      yield document;
+    }
+  }
+}
+
+/**
+ * Recursive async generator to yield each document page until out of pages
+ * 
+ * @param {DWRest.IFileCabinet} documentTray 
+ * @param {IAutoStoreConfig} config 
+ * @returns {DWRest.IDocument[]}
+ */
+async function* pageThroughDocumentTray(documentTray: DWRest.IFileCabinet, config: IAutoStoreConfig) {
+  const documents = await restApi.GetDocumentQueryResultForSpecifiedCountFromFileCabinet(documentTray, config.limit ?? DEFAULT_STORE_LIMIT);
+  yield documents;
+
+  async function* requestNextResult(documents: DWRest.IDocumentsQueryResult): AsyncGenerator<DWRest.IDocumentsQueryResult> {
+    if (documents.Next) {
+      const next = await restApi.GetNextResultFromDocumentQueryResult(documents);
+      yield* requestNextResult(documents);
+    }
+  }
+
+  yield* requestNextResult(documents);
+}
+
+/**
+ * Returns intellix field suggestions for a document by the Intelligent Indexing Service
+ * 
+ * Only use field suggestions matching their coresponding filter rule
+ * If keepPreFilledIndexes:true field suggestion will be not be overridden if index already has a pre-filled value
+ * 
+ * @param document 
+ * @param config 
+ * @returns {Promise<DWRest.IDocumentSuggestion[]>}
+ */
+async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStoreConfig): Promise<DWRest.IDocumentSuggestion[]> {
+  let suggestions = await restApi.GetSuggestionFields(document);
+  return suggestions.Field.map(suggestionField => {
+
+    let suggestionConfig = config?.suggestions?.find(o => o['name'] === suggestionField.Name);
+    let fieldIndex = document?.Fields?.find(o => o['fieldName'] === suggestionField.Name);
+
+    if (suggestionConfig &&
+      (suggestionConfig.filters && isFilterMatch(suggestionConfig.filters, suggestionField) === true) ||
+      (config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0)) {
+      return suggestionField;
+    }
+
+    if(suggestionField?.Value[0]) {
+      suggestionField.Value[0].Item = null;
+    }
+
+    return suggestionField;
+  });
 }
 
 /**
 * Get allowed intellix trusts from filter configuration
 * 
 * @param {IAutoStoreConfig} config
-*/ 
-function getAllowedIntellixTrust(config:IAutoStoreConfig)  {
+* @returns {string|string[]}
+*/
+function getAllowedIntellixTrust(config: IAutoStoreConfig) {
   let filter = config?.filters?.find(o => o['name'] === INTELLIX_TRUST_NAME);
   return filter?.pattern;
-}
-
-/**
-* Document filter match?
-* Returns true if any of the given filter glob patterns match the specified document property string.
-* @see https://github.com/micromatch/micromatch
-* 
-* @param {DWRest.IDocument} document 
-* @param {IAutoStoreConfigFilter[]} filters
-* @returns {boolean}
-*/
-function isDocumentFilterMatch(document: DWRest.IDocument, filters: IAutoStoreConfigFilter[]) {
-  return filters.every((filter:IAutoStoreConfigFilter) => {
-    return micromatch.isMatch(getDocumentProperty(filter.name, document), filter.pattern, filter.options);
-  });
-}
-
-/**
- * Get source document property using dot notation
- * 
- * @param property 
- * @param obj 
- * @returns 
- */
-function getDocumentProperty(property:string, obj:DWRest.IDocument) {
-  return property.split('.').reduce((obj:any, i) => {
-    return obj[i];
-}, obj);
 }
 
 /**
  * Traces error
  *
  * @param {Error} error
+ * @returns void
  */
 function traceError(error: Error) {
   console.error(
-    "Error message:\n\r" + error.message + "\n\rError Stack:\n\r" + error.stack
+    "Error message:\n\r" + error.message //+ "\n\rError Stack:\n\r" + error.stack
   );
+}
+
+/**
+ * Return true if all filter matches defined glob patterns, otherise false if any one filter fails
+ * 
+ * @param filters 
+ * @param obj 
+ * @returns {boolean}
+ */
+function isFilterMatch(filters: IAutoStoreConfigFilter[], obj: object) {
+  return filters.every((filter: IAutoStoreConfigFilter) => {
+    return micromatch.isMatch(getProperty(filter.name, obj), filter.pattern, filter.options);
+  })
+}
+
+/**
+ * Get property from object
+ * 
+ * @see https://github.com/jquense/expr#readme
+ * 
+ * @param property 
+ * @param obj 
+ * @returns {any}
+ */
+function getProperty(property: string, obj: object) {
+  let propertyAccessor = expr.getter(property, true);
+  return propertyAccessor(obj);
 }

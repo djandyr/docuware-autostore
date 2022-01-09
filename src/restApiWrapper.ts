@@ -122,6 +122,25 @@ class RestApiWrapper {
   }
 
   /**
+   * Returns the next 'page' of document results
+   * @param {DWRest.IDocumentsQueryResult} documentQueryResult
+   * @returns {Promise<DWRest.IDocumentsQueryResult>}
+   */
+  GetNextResultFromDocumentQueryResult(
+      documentQueryResult: DWRest.IDocumentsQueryResult
+    ): Promise<DWRest.IDocumentsQueryResult> {
+      const nextLink = this.GetLinkFromModel(documentQueryResult, "next");
+  
+      if (nextLink) {
+        return request.get(nextLink, this.docuWare_request_config).promise();
+      } else {
+        throw new Error(
+          "No next link available, you already received all results."
+        );
+      }
+    }
+
+  /**
    * Transfer a number documents from document tray to FileCabinet
    *
    * @param {number[]} docIds
@@ -135,13 +154,14 @@ class RestApiWrapper {
     basketId: string,
     fileCabinet: DWRest.IFileCabinet,
     keepSource: boolean,
-    storeDialogId?: string
+    storeDialogId?: string,
+    fillIntellix?: boolean
   ): Promise<DWRest.IDocumentsQueryResult> {
     const fcTransferInfo: DWRest.IFileCabinetTransferInfo = {
       KeepSource: keepSource,
       SourceDocId: docIds,
       SourceFileCabinetId: basketId,
-      FillIntellix: true
+      FillIntellix: fillIntellix ?? true
     };
 
     let transferLink: string = this.GetLink(fileCabinet, "transfer");
@@ -177,6 +197,27 @@ class RestApiWrapper {
   
       return request
         .get(suggestionLink, this.docuWare_request_config)
+        .promise();
+  }
+
+  /**
+   * Update index values of specified document
+   *
+   * @param {DWRest.IDocument} document
+   * @param {DWRest.IFieldList} fieldsToUpdate
+   * @returns {Promise<DWRest.IFieldList>}
+   */
+     UpdateDocumentIndexValues(
+      document: DWRest.IDocument,
+      fieldsToUpdate: DWRest.IFieldList
+    ): Promise<DWRest.IFieldList> {
+      const fieldsLink: string = this.GetLink(document, "fields");
+  
+      return request
+        .post(fieldsLink, {
+          ...this.docuWare_request_config,
+          body: fieldsToUpdate,
+        })
         .promise();
     }
 

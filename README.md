@@ -95,29 +95,68 @@ npm run start -- --dry-run
 
 * __autoStore.filters__    
    
-   Filter source documents with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
+   Filter source document properties with boolean matching glob patterns using wildcards (*, ? and !). Each filter accepts the following parameters:
+
+   > For allowed properties please see [IDocument type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
    
-   * name {String}: [Document property](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#properties) name (can be accessed using dot notation)
+   * name {String}: Document property (can be accessed using dot notation)
    * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
    * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
    ---
-   Example 1: Filter source documents by [Intellix Trust](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.IntellixTrust.html) level. A source document will be only be stored if `Document.IntellixTrust` property is Green, or Yellow
+   Example 1: Filter source documents by Intellix Trust level. A source document will be only be stored if `Document.IntellixTrust` property is Green, or Yellow
 
-      [
-          {
-              "name": "IntellixTrust", 
-              "pattern": ["Green", "Yellow"]
-          }
-      ]  
+        "filters": [
+            {
+                "name": "IntellixTrust",
+                "pattern": ["Green","Yellow"]
+            }
+        ]
    
-   Example 2: Filter source documents where [Title](https://developer.docuware.com/dotNet_API_Reference/PlatformServerClient/DocuWare.Platform.ServerClient.Document.html#DocuWare_Platform_ServerClient_Document_Title) contains one or more partial strings;
+   Example 2: Filter source documents where Title contains one or more partial strings;
 
-      [
-          {
-              "name": "Title", 
-              "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
-          }
-      ]  
+        "filters": [
+            {
+                "name": "Title",
+                "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
+            }
+        ]
+
+* __autoStore.suggestions__
+
+    Define which simple intellix field suggestions from Intelligent Indexing Service to be stored as document index value
+
+   * name {String}: Field Database Name
+   * filters {Object[]}: Filter field suggestions
+        > For allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
+   
+        * name {String}: Document suggestion field property
+        * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
+        * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
+   ---
+
+   Example 1: Use intellix suggestions fields subject and company where condfidence is green, or yellow
+
+    ```
+        "suggestions": [
+            {
+                "name": "SUBJECT",
+                "filters": [{
+                    "name": "Confidence", "pattern": ["Green","Yellow"]
+                }]
+            },
+            {
+                "name": "COMPANY",
+                "filters": [{
+                    "name": "Confidence", "pattern": ["Green","Yellow"]
+                }]
+            }
+        ],
+
+    ```
+
+* __autoStore.keepPreFilledIndexes__    
+
+  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be set to null
 
 * __autoStore.keepSource__    
 
