@@ -44,7 +44,7 @@ polly()
     console.log(chalk.whiteBright("Organization:"), chalk.white(organization.Name));
 
     config.autoStore.forEach(async (config, index) => {
-      const fileCabinet: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.fileCabinetID);
+      const fileCabinet: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.fileCabinetID);  
       const documentTray: DWRest.IFileCabinet = await restApi.GetFileCabinet(config.documentTrayID);
 
       console.log(chalk.yellow(`\nTask ${index + 1}:`));
@@ -98,6 +98,15 @@ polly()
  */
 function loadConfiguration(filepath: string) {
   let config: IConfig = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+
+  if(!config.autoStore) throw new Error('No autostores have been configured');
+
+  config.autoStore.map((autoStore, i) => {
+    if(!autoStore.fileCabinetID) throw new Error(`Task ${i+1}: File Cabinet ID missing`);
+    if(!autoStore.documentTrayID) throw new Error(`Task ${i+1}: Document Tray ID missing`);
+    if(!autoStore.storeDialogID) throw new Error(`Task ${i+1}: Store Dialog ID missing`);
+  });
+
   return config;
 }
 
@@ -244,7 +253,7 @@ function getAllowedIntellixTrust(config: IAutoStoreConfig) {
  */
 function traceError(error: Error) {
   console.error(
-    "Error message:\n\r" + error.message //+ "\n\rError Stack:\n\r" + error.stack
+    "Error message:\n\r" + error.message + "\n\rError Stack:\n\r" + error.stack
   );
 }
 
