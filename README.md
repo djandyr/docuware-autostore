@@ -8,25 +8,25 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 
 ## Install
 
-Install Node Packages
+1. Install Node Packages
 
-```
-npm install
-```
+	```
+	npm install
+	```
 
-Compile the code so it can be run, also required if any typescript files are changed
+	Compile the code so it can be run, also required if any typescript files are changed
 
-```
-npx tsc
-```
+	```
+	npx tsc
+	```
 
-Create a new config.json autostore configuration in root folder. See [Example Configuration](#configuration)
+2. Create a new `config.json` autostore configuration in root folder. See [Example Configuration](#configuration)
 
-Run AutoStore
+3. Run AutoStore
 
-```
-npm run start --silent
-```
+	```
+	npm run start --silent
+	```
 
 ## Command Arguments
 
