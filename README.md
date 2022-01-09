@@ -126,8 +126,7 @@ npm run start -- --dry-run
     Define which simple intellix field suggestions from Intelligent Indexing Service to be stored as document index value
 
    * name {String}: Field Database Name
-   * filters {Object[]}: Filter Configuration
-       		> For allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
+   * filters {Object[]}: Filter Configuration for allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
    		* name {String}: Document suggestion field property
    		* pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
    		* [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
