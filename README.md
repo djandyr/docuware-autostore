@@ -8,25 +8,25 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 
 ## Install
 
-Install Node Packages
+1. Install Node Packages
 
-```
-npm install
-```
+	```
+	npm install
+	```
 
-Compile the code so it can be run, also required if any typescript files are changed
+2. Compile the code so it can be run, also required if any typescript files are changed
 
-```
-npx tsc
-```
+	```
+	npx tsc
+	```
 
-Create a new config.json autostore configuration in root folder. See [Example Configuration](#configuration)
+3. Create a new `config.json` autostore configuration in root folder. See [Example Configuration](#configuration)
 
-Run AutoStore
+4. Run AutoStore
 
-```
-npm run start --silent
-```
+	```
+	npm run start --silent
+	```
 
 ## Command Arguments
 
@@ -123,7 +123,7 @@ npm run start -- --dry-run
 
 * __autoStore.suggestions__
 
-    Define which simple intellix field suggestions from Intelligent Indexing Service to be stored as document index value
+    Exclusive list of simple intellix field suggestions to be stored as document index values. These suggestions are provided by DocuWare Intelligent Indexing Service
 
    * name {String}: Field Database Name
    * filters {Object[]}: Filter Configuration for allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
@@ -151,7 +151,7 @@ npm run start -- --dry-run
 
 * __autoStore.keepPreFilledIndexes__    
 
-  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be set to null
+  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be overriden
 
 * __autoStore.keepSource__    
 
@@ -172,7 +172,7 @@ __How do I find my File Cabinet ID?__
 
 __How do I find my Document Tray ID?__
 
-1. Open the following service URL from your Docuware Cloud instance in your browser `https://my.docuware.cloud/DocuWare/Platform/FileCabinets`
+1. Open the following service URL (change to your Docuware Cloud instance) in browser `https://my.docuware.cloud/DocuWare/Platform/FileCabinets`
 2. Search for `@AssignedCabinetId="Your File Cabinet ID"`
 3. If File Cabinet `@IsBasket = "true"` and `@Id` prefixed with `_b`
 4. Note `@Id`
