@@ -172,7 +172,7 @@ __How do I find my File Cabinet ID?__
 
 __How do I find my Document Tray ID?__
 
-1. Open the following service URL (change to your Docuware Cloud instance) in your browser `https://my.docuware.cloud/DocuWare/Platform/FileCabinets`
+1. Open the following service URL (change to your Docuware Cloud instance) in browser `https://my.docuware.cloud/DocuWare/Platform/FileCabinets`
 2. Search for `@AssignedCabinetId="Your File Cabinet ID"`
 3. If File Cabinet `@IsBasket = "true"` and `@Id` prefixed with `_b`
 4. Note `@Id`
