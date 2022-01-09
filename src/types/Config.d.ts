@@ -16,12 +16,12 @@ export interface IAutoStoreConfig {
     keepSource: boolean,
     suggestions: IAutoStoreConfigSuggestion[],
     keepPreFilledIndexes: boolean,
+    restrictSuggestions: boolean,
     limit: number,
 }
 
 export interface IAutoStoreConfigSuggestion {
     name: string,
-    ignore: boolean,
     filters: IAutoStoreConfigFilter[]
 }
 

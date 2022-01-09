@@ -105,6 +105,9 @@ function loadConfiguration(filepath: string) {
     if(!autoStore.fileCabinetID) throw new Error(`Task ${i+1}: File Cabinet ID missing`);
     if(!autoStore.documentTrayID) throw new Error(`Task ${i+1}: Document Tray ID missing`);
     if(!autoStore.storeDialogID) throw new Error(`Task ${i+1}: Store Dialog ID missing`);
+    if(typeof autoStore.keepPreFilledIndexes === 'undefined') autoStore.keepPreFilledIndexes = false;
+    if(typeof autoStore.restrictSuggestions === 'undefined') autoStore.restrictSuggestions = true;
+    if(typeof autoStore.keepSource === 'undefined') autoStore.keepSource = false;
   });
 
   return config;
@@ -213,25 +216,16 @@ async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStor
 
   return suggestions.Field.filter(suggestionField => {
     let fieldIndex = document?.Fields?.find(o => o['fieldName'] === suggestionField.Name);
-    return !(config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0)
-  }).map(suggestionField => {
     let suggestionConfig = config?.suggestions?.find(o => o['name'] === suggestionField.Name);
 
-    if (suggestionConfig &&
-      (suggestionConfig.filters && isFilterMatch(suggestionConfig.filters, suggestionField) === true)) {
-      return suggestionField;
+    if(config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0) return false;
+    if(config.restrictSuggestions === true && !suggestionConfig) return false;
+    if(config.filters && suggestionConfig && suggestionConfig.filters) {
+      return isFilterMatch(suggestionConfig.filters, suggestionField)
     }
 
-    if(suggestionConfig && suggestionConfig.name) {
-      return suggestionField;
-    }
-
-    if(suggestionField?.Value[0]) {
-      suggestionField.Value[0].Item = null;
-    }
-
-    return suggestionField;
-  });
+    return true;
+  })
 }
 
 /**

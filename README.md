@@ -156,17 +156,21 @@ npm run start -- --dry-run
             }
         ]
 
+* __autoStore.restrictSuggestions__
+
+If this flag is true, only intellix suggestion fields named in configuration will be returned. Default:  `true`
+
 * __autoStore.keepPreFilledIndexes__    
 
-  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be overriden
+  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be overriden. Default: `false`
 
 * __autoStore.keepSource__    
 
-    If this flag is true the source documents remain in the document tray; otherwise they are removed from document tray
+    If this flag is true the source documents remain in the document tray; otherwise they are removed from document tray. Default: `false`
 
 * __autoStore.limit__ 
 
-    Limit the number of files returned from each document tray page. Default set to 100
+    Limit the number of files returned from each document tray page. Default: `100`
 
 ## FAQ
 
