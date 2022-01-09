@@ -14,15 +14,15 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 	npm install
 	```
 
-	Compile the code so it can be run, also required if any typescript files are changed
+2. Compile the code so it can be run, also required if any typescript files are changed
 
 	```
 	npx tsc
 	```
 
-2. Create a new `config.json` autostore configuration in root folder. See [Example Configuration](#configuration)
+3. Create a new `config.json` autostore configuration in root folder. See [Example Configuration](#configuration)
 
-3. Run AutoStore
+4. Run AutoStore
 
 	```
 	npm run start --silent
