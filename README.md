@@ -126,7 +126,7 @@ npm run start -- --dry-run
     Define which simple intellix field suggestions from Intelligent Indexing Service to be stored as document index value
 
    * name {String}: Field Database Name
-   * filters {Object[]}: Filter field suggestions
+   * filters {Object[]}: Filter Configuration
         > For allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
    
         * name {String}: Document suggestion field property
@@ -134,7 +134,7 @@ npm run start -- --dry-run
         * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
    ---
 
-   Example 1: Use intellix suggestions fields subject and company where condfidence is green, or yellow
+   Example 1: Use only intellix suggestions fields subject and company where intellix confidence is green, or yellow
 
     ```
         "suggestions": [
