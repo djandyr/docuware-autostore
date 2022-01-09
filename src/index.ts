@@ -56,6 +56,7 @@ polly()
 
       let docIdsToTransfer: number[] = [];
       for await (const document of getDocuments(documentTray, config)) {
+
         if (args['dry-run']) {
           console.log(`\t> ID:${document.Id} Title:${document.Title} IntellixTrust:${document.IntellixTrust}`);
           if (config.suggestions) {
@@ -64,16 +65,15 @@ polly()
               console.log(`\t\t> ${field.Name.padEnd(25)} = ${field.Value?.shift()?.Item}`);
             };
           }
-        } else {
-          if (config.suggestions) {
-            let suggestions = await getSuggestionFields(document, config);
-            await updateDocumentIndexValues(document, suggestions);
-          }
-
-          if (document.Id) {
-            docIdsToTransfer.push(document.Id)
-          }
+          continue; // Do not transfer documents in dry-run
         }
+
+        // Update document indexes if suggesstion field configuration is defined
+        config.suggestions && await updateDocumentIndexValues(document, 
+          await getSuggestionFields(document, config)
+        )
+
+        document.Id && docIdsToTransfer.push(document.Id)
       }
 
       await transferDocument(
