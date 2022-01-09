@@ -28,7 +28,7 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 	npm run start
 	```
 
-    Alternatively, run `npm link` to symlink package globally (may require sudo) allowing script to be executted by running `docuware-autostore`
+    Alternatively, run `npm link` to symlink package globally (may require sudo) allowing script to be executed by running `docuware-autostore`
 
     ```
     npm link
