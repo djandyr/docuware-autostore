@@ -158,7 +158,7 @@ npm run start -- --dry-run
 
 * __autoStore.restrictSuggestions__
 
-If this flag is true, only intellix suggestion fields named in configuration will be returned. Default:  `true`
+  If this flag is true, only intellix suggestion fields named in configuration will be returned. If false, all intellix suggestions will be returned. Default:  `true`
 
 * __autoStore.keepPreFilledIndexes__    
 
