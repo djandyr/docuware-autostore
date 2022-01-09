@@ -130,7 +130,7 @@ npm run start -- --dry-run
 
 * __autoStore.suggestions__
 
-    Optionally list the simple intellix field suggestions to be stored as document index values. These suggestions are provided by DocuWare Intelligent Indexing Service
+    Optionally list each simple intellix field suggestion to be stored as document index value. These suggestions are provided by DocuWare Intelligent Indexing Service
 
    * name {String}: Field Database Name
    * filters {Object[]}: Filter Configuration for allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
