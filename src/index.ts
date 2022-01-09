@@ -160,7 +160,7 @@ async function* getDocuments(documentTray: DWRest.IFileCabinet, config: IAutoSto
     const filteredDocuments = documents.Items.filter(doc =>
       isFilterMatch(config.filters, doc)
     );
-    
+
     for (let document of filteredDocuments) {
       yield document;
     }
@@ -200,14 +200,16 @@ async function* pageThroughDocumentTray(documentTray: DWRest.IFileCabinet, confi
  */
 async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStoreConfig): Promise<DWRest.IDocumentSuggestion[]> {
   let suggestions = await restApi.GetSuggestionFields(document);
-  return suggestions.Field.map(suggestionField => {
 
-    let suggestionConfig = config?.suggestions?.find(o => o['name'] === suggestionField.Name);
+  return suggestions.Field.filter(suggestionField => {
     let fieldIndex = document?.Fields?.find(o => o['fieldName'] === suggestionField.Name);
+    return config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0
+
+  }).map(suggestionField => {
+    let suggestionConfig = config?.suggestions?.find(o => o['name'] === suggestionField.Name);
 
     if (suggestionConfig &&
-      (suggestionConfig.filters && isFilterMatch(suggestionConfig.filters, suggestionField) === true) ||
-      (config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0)) {
+      (suggestionConfig.filters && isFilterMatch(suggestionConfig.filters, suggestionField) === true)) {
       return suggestionField;
     }
 
