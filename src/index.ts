@@ -60,7 +60,7 @@ polly()
           if (config.suggestions) {
             let suggestions = await getSuggestionFields(document, config);
             for (const field of suggestions) {
-              console.log(`\t\t> ${field.Name.padEnd(25)} = ${field.Value?.shift()?.Item}`);
+              console.log(`\t\t> ${field.Name.padEnd(25)} = ${('' + field.Value?.shift()?.Item).padEnd(50)} Confidence: ${field.Confidence}`);
             };
           }
           continue; // Do not transfer documents in dry-run
@@ -207,7 +207,7 @@ async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStor
 
   }).map(suggestionField => {
     let suggestionConfig = config?.suggestions?.find(o => o['name'] === suggestionField.Name);
-    
+
     if (suggestionConfig &&
       (suggestionConfig.filters && isFilterMatch(suggestionConfig.filters, suggestionField) === true)) {
       return suggestionField;
