@@ -151,7 +151,7 @@ npm run start -- --dry-run
 
 * __autoStore.keepPreFilledIndexes__    
 
-  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be set to null
+  If this flag is true, and suggestion field configuration has been defined. Any pre-filled indexes in source documents will be preserved. If false, indexes will be overriden
 
 * __autoStore.keepSource__    
 
