@@ -25,8 +25,15 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 4. Run AutoStore
 
 	```
-	npm run start --silent
+	npm run start
 	```
+
+    Alternatively, run `npm link` to symlink package globally (may require sudo) allow script to be executted by running `docuware-autostore`
+
+    ```
+    npm link
+    docuware-autostore
+    ```
 
 ## Command Arguments
 

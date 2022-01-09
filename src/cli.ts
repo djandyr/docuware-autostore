@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as DWRest from "./types/DW_Rest";
 import * as fs from "fs";
 import * as micromatch from "micromatch";

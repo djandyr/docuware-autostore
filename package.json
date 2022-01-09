@@ -2,17 +2,20 @@
   "name": "docuware_autostore",
   "version": "1.0.0",
   "description": "Store automatically from document tray to file cabinet in DocuWare",
-  "main": "index.js",
+  "main": "cli.js",
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "start": "node ./dist/index.js",
+    "start": "node ./dist/cli.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
+  },
+  "bin": {
+    "docuware-autostore": "./dist/cli.js"
   },
   "keywords": [
     "docuware"
   ],
-  "author": "Ingot Portal Limited",
+  "author": "Andy Roberts",
   "license": "MIT",
   "dependencies": {
     "@types/micromatch": "^4.0.2",
