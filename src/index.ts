@@ -82,7 +82,6 @@ polly()
       );
 
       console.log(chalk.green(`\t> Stored ${chalk.green(docIdsToTransfer.length)} documents\n`));
-
     });
   })
   .catch((error: Error) => {
@@ -204,12 +203,15 @@ async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStor
   return suggestions.Field.filter(suggestionField => {
     let fieldIndex = document?.Fields?.find(o => o['fieldName'] === suggestionField.Name);
     return !(config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0)
-
   }).map(suggestionField => {
     let suggestionConfig = config?.suggestions?.find(o => o['name'] === suggestionField.Name);
 
     if (suggestionConfig &&
       (suggestionConfig.filters && isFilterMatch(suggestionConfig.filters, suggestionField) === true)) {
+      return suggestionField;
+    }
+
+    if(suggestionConfig && suggestionConfig.name) {
       return suggestionField;
     }
 
