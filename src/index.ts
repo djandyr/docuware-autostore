@@ -37,7 +37,6 @@ polly()
   .waitAndRetry(3)
   .executeForPromise(async () => {
     const logonResponse: DWRest.ILogonResponse = await restApi.Logon(logonModel);
-
     const organization: DWRest.IOrganization = await restApi.GetOrganization();
     console.log(chalk.whiteBright("Username:"), chalk.white(logonModel.Username));
     console.log(chalk.whiteBright("Organization:"), chalk.white(organization.Name));
@@ -56,7 +55,6 @@ polly()
 
       let docIdsToTransfer: number[] = [];
       for await (const document of getDocuments(documentTray, config)) {
-
         if (args['dry-run']) {
           console.log(`\t> ID:${document.Id} Title:${document.Title} IntellixTrust:${document.IntellixTrust}`);
           if (config.suggestions) {
@@ -68,12 +66,12 @@ polly()
           continue; // Do not transfer documents in dry-run
         }
 
-        // Update document indexes if suggesstion field configuration is defined
-        config.suggestions && await updateDocumentIndexValues(document, 
-          await getSuggestionFields(document, config)
-        )
-
-        document.Id && docIdsToTransfer.push(document.Id)
+        if(document.Id) {
+          config.suggestions && await updateDocumentIndexValues(document, 
+            await getSuggestionFields(document, config)
+          )
+          docIdsToTransfer.push(document.Id)
+        }
       }
 
       await transferDocument(
@@ -162,7 +160,7 @@ async function* getDocuments(documentTray: DWRest.IFileCabinet, config: IAutoSto
     const filteredDocuments = documents.Items.filter(doc =>
       isFilterMatch(config.filters, doc)
     );
-
+    
     for (let document of filteredDocuments) {
       yield document;
     }
