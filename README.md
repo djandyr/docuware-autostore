@@ -8,6 +8,8 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 
 ## Install
 
+Minimum version of Node.js v10.24.1 required
+
 1. Install Node Packages
 
 	```
