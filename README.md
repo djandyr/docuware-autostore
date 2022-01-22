@@ -172,7 +172,7 @@ npm run start -- --dry-run
 
 * __autoStore.limit__ 
 
-    Limit the number of files returned from each document tray page. Default: `100`
+    Limit results returned from each document tray page. Default: `100`
 
 ## FAQ
 
