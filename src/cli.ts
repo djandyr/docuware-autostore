@@ -11,7 +11,7 @@ import { IConfig, IAutoStoreConfig, IAutoStoreConfigFilter } from "./types/Confi
 import expr from "property-expr";
 
 const DEFAULT_STORE_LIMIT = 100;
-const INTELLIX_TRUST_NAME = "IntellixTrust";
+const INTELLIX_FAILED = "Failed";
 
 const args = yargs(process.argv.slice(2))
   .option("config", {
@@ -57,22 +57,29 @@ polly()
 
       let docIdsToTransfer: number[] = [];
       for await (const document of getDocuments(documentTray, config)) {
-        if (args['dry-run']) {
-          console.log(`\t> ID:${document.Id} Title:${document.Title} IntellixTrust:${document.IntellixTrust}`);
-          if (config.suggestions) {
-            let suggestions = await getSuggestionFields(document, config);
-            for (const field of suggestions) {
-              console.log(`\t\t> ${field.Name.padEnd(25)} = ${('' + field.Value?.shift()?.Item).padEnd(50)} Confidence: ${field.Confidence}`);
-            };
+        if(isFilterMatch(config.filters ?? [], document)) {
+          if (args['dry-run']) {
+            console.log(`\t> ID:${document.Id} Title:${document.Title} IntellixTrust:${document.IntellixTrust}`);
+            if (config.suggestions) {
+              let suggestions = await getSuggestionFields(document, config);
+              for (const field of suggestions) {
+                console.log(`\t\t> ${field.Name.padEnd(25)} = ${('' + field.Value?.shift()?.Item).padEnd(50)} Confidence: ${field.Confidence}`);
+              };
+            }
+            continue; // Do not transfer documents in dry-run
           }
-          continue; // Do not transfer documents in dry-run
+
+          if(document.Id) {
+            config.suggestions && await updateDocumentIndexValues(document, 
+              await getSuggestionFields(document, config)
+            )
+            docIdsToTransfer.push(document.Id)
+          }
         }
 
-        if(document.Id) {
-          config.suggestions && await updateDocumentIndexValues(document, 
-            await getSuggestionFields(document, config)
-          )
-          docIdsToTransfer.push(document.Id)
+        // If reintellixOnFailure = true and intelligent indexing has failed (grey) resend textshots to Intellix for source document
+        if(config.reintellixOnFailure === true && document.IntellixTrust === INTELLIX_FAILED) {
+            await reintellixDocument(documentTray, document);
         }
       }
 
@@ -108,6 +115,8 @@ function loadConfiguration(filepath: string) {
     if(typeof autoStore.keepPreFilledIndexes === 'undefined') autoStore.keepPreFilledIndexes = false;
     if(typeof autoStore.restrictSuggestions === 'undefined') autoStore.restrictSuggestions = true;
     if(typeof autoStore.keepSource === 'undefined') autoStore.keepSource = false;
+    if(typeof autoStore.reintellixOnFailure === 'undefined') autoStore.reintellixOnFailure = true;
+    if(typeof autoStore.filters === 'undefined') autoStore.filters = []
   });
 
   return config;
@@ -160,7 +169,7 @@ async function transferDocument(
 }
 
 /**
- * Returns documents in tray matching defined filter rules
+ * Returns documents in tray matching
  * 
  * @param {DWRest.IFileCabinet} documentTray 
  * @param {IAutoStoreConfig} config 
@@ -170,11 +179,7 @@ async function* getDocuments(documentTray: DWRest.IFileCabinet, config: IAutoSto
   const pager = await pageThroughDocumentTray(documentTray, config);
 
   for await (const documents of pager) {
-    const filteredDocuments = documents.Items.filter(doc =>
-      isFilterMatch(config.filters, doc)
-    );
-
-    for (let document of filteredDocuments) {
+    for (let document of documents.Items) {
       yield document;
     }
   }
@@ -221,7 +226,7 @@ async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStor
     if(config.keepPreFilledIndexes === true && fieldIndex?.item.length > 0) return false;
     if(config.restrictSuggestions === true && !suggestionConfig) return false;
     if(config.filters && suggestionConfig && suggestionConfig.filters) {
-      return isFilterMatch(suggestionConfig.filters, suggestionField)
+      return isFilterMatch(suggestionConfig.filters ?? [], suggestionField)
     }
 
     return true;
@@ -235,8 +240,21 @@ async function getSuggestionFields(document: DWRest.IDocument, config: IAutoStor
 * @returns {string|string[]}
 */
 function getAllowedIntellixTrust(config: IAutoStoreConfig) {
-  let filter = config?.filters?.find(o => o['name'] === INTELLIX_TRUST_NAME);
+  let filter = config?.filters?.find(o => o['name'] === "IntellixTrust");
   return filter?.pattern;
+}
+
+/**
+ * Resend document textshots to Intellix
+ * 
+ * @param fileCabinet 
+ * @param document 
+ */
+async function reintellixDocument(
+  fileCabinet: DWRest.IFileCabinet,
+  document: DWRest.IDocument,
+){
+  return await restApi.ReIntellixDocument(fileCabinet, document);
 }
 
 /**

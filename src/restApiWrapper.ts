@@ -207,7 +207,7 @@ class RestApiWrapper {
    * @param {DWRest.IFieldList} fieldsToUpdate
    * @returns {Promise<DWRest.IFieldList>}
    */
-     UpdateDocumentIndexValues(
+  UpdateDocumentIndexValues(
       document: DWRest.IDocument,
       fieldsToUpdate: DWRest.IFieldList
     ): Promise<DWRest.IFieldList> {
@@ -219,7 +219,29 @@ class RestApiWrapper {
           body: fieldsToUpdate,
         })
         .promise();
-    }
+  }
+
+  /**
+   * Run intelligent indexing on document
+   * 
+   * @param {DWRest.IDocument} document
+   * @param {DWRest.IFileCabinet} fileCabinet
+   * 
+   * @returns {Promise<DWRest.IDocument>}
+   */
+  ReIntellixDocument(
+    fileCabinet: DWRest.IFileCabinet,
+    document: DWRest.IDocument,
+  ): Promise<DWRest.IDocument> {
+    const processDocumentActionLink: string = `/DocuWare/Platform/FileCabinets/${fileCabinet.Id}/Operations/ProcessDocumentAction?docId=${document.Id}`;
+    const documentActionInfo: DWRest.IDocumentActionInfo = {DocumentActionParameters: {}, DocumentAction: 0}; // ReIntellix=0	Resend textshots to Intellix
+    return request
+      .put(processDocumentActionLink, {
+        ...this.docuWare_request_config,
+        body: documentActionInfo,
+      })
+      .promise();
+  }  
 
   /**
    * Helper function for preparing the logon

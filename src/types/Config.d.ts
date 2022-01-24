@@ -17,6 +17,7 @@ export interface IAutoStoreConfig {
     suggestions: IAutoStoreConfigSuggestion[],
     keepPreFilledIndexes: boolean,
     restrictSuggestions: boolean,
+    reintellixOnFailure: boolean,
     limit: number,
 }
 

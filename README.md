@@ -14,15 +14,9 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 	npm install
 	```
 
-2. Compile the code so it can be run, also required if any typescript files are changed
+2. Create a new `config.json` autostore configuration in root folder. See [Example Configuration](#configuration)
 
-	```
-	npx tsc
-	```
-
-3. Create a new `config.json` autostore configuration in root folder. See [Example Configuration](#configuration)
-
-4. Run AutoStore
+3. Run AutoStore
 
 	```
 	npm run start
@@ -34,6 +28,7 @@ This script addresses lack of automation within DocuWare cloud that forces logge
     npm link
     docuware-autostore
     ```
+
 
 ## Command Arguments
 
@@ -167,6 +162,10 @@ npm run start -- --dry-run
 * __autoStore.keepSource__    
 
     If this flag is true the source documents remain in the document tray; otherwise they are removed from document tray. Default: `false`
+
+* __autoStore.reintellixOnFailure__    
+
+    If this flag is true and intelligent indexing has failed (grey) on source document force resending of textshots to intellix by restarting intelligent indexing. Default: `true`
 
 * __autoStore.limit__ 
 

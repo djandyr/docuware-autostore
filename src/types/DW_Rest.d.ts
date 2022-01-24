@@ -1519,3 +1519,14 @@ export interface IDocumentSuggestionFieldValue {
  export interface IDocumentSuggestionsField {
   Field: IDocumentSuggestion[];
 }
+
+export interface IDocumentAction {
+
+}
+/**
+ * DocumentActionInfo
+ */
+export interface IDocumentActionInfo {
+  DocumentActionParameters: object;
+  DocumentAction: integer 
+}
