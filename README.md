@@ -8,6 +8,8 @@ This script addresses lack of automation within DocuWare cloud that forces logge
 
 ## Install
 
+Minimum version of Node.js v10.24.1 required
+
 1. Install Node Packages
 
 	```
@@ -128,7 +130,7 @@ npm run start -- --dry-run
     Optionally list each simple intellix field suggestion to be stored as document index value. These suggestions are provided by DocuWare Intelligent Indexing Service
 
    * name {String}: Field Database Name
-   * filters {Object[]}: Filter Configuration for allowed properties please see [IDocumentSuggestion type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
+   * filters {Object[]}: Filter Configuration
    		* name {String}: Document suggestion field property
    		* pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
    		* [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
@@ -169,7 +171,7 @@ npm run start -- --dry-run
 
 * __autoStore.limit__ 
 
-    Limit the number of files returned from each document tray page. Default: `100`
+    Limit results returned from each document tray page. Default: `100`
 
 ## FAQ
 
