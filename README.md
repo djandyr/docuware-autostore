@@ -167,7 +167,7 @@ npm run start -- --dry-run
 
 * __autoStore.reintellixOnFailure__    
 
-    If this flag is true and intelligent indexing has failed (grey) on source document force resending of textshots to intellix by restarting intelligent indexing. Default: `true`
+    If this flag is true and intelligent indexing has failed (grey) on source document force resending of textshots to intellix. Default: `true`
 
 * __autoStore.limit__ 
 
