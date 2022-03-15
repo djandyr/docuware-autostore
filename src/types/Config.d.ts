@@ -28,6 +28,6 @@ export interface IAutoStoreConfigSuggestion {
 
 export interface IAutoStoreConfigFilter {
     name: string,
-    pattern: string|string[],
+    pattern: string[],
     options?: {}
 }

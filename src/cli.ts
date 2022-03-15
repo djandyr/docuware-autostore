@@ -2,7 +2,6 @@
 
 import * as DWRest from "./types/DW_Rest";
 import * as fs from "fs";
-import * as micromatch from "micromatch";
 import polly from "polly-js";
 import chalk from "chalk";
 import yargs, { option } from "yargs"
@@ -57,13 +56,15 @@ polly()
 
       let docIdsToTransfer: number[] = [];
       for await (const document of getDocuments(documentTray, config)) {
-        if(isFilterMatch(config.filters ?? [], document)) {
+        if(isFilterMatch(config.filters ? config.filters : [], document)) {
           if (args['dry-run']) {
             console.log(`\t> ID:${document.Id} Title:${document.Title} IntellixTrust:${document.IntellixTrust}`);
             if (config.suggestions) {
               let suggestions = await getSuggestionFields(document, config);
               for (const field of suggestions) {
-                console.log(`\t\t> ${field.Name.padEnd(25)} = ${('' + field.Value?.shift()?.Item).padEnd(50)} Confidence: ${field.Confidence}`);
+                  if(field && field.Value && field.Value[0]) {
+                    console.log(`\t\t> ${field.Name.padEnd(25)} = ${('' + field.Value[0].Item).padEnd(50)} Confidence: ${field.Confidence}`);
+                  }
               };
             }
             continue; // Do not transfer documents in dry-run
@@ -278,7 +279,10 @@ function traceError(error: Error) {
  */
 function isFilterMatch(filters: IAutoStoreConfigFilter[], obj: object) {
   return filters.every((filter: IAutoStoreConfigFilter) => {
-    return micromatch.isMatch(getProperty(filter.name, obj), filter.pattern, filter.options);
+    return filter.pattern.every((value: string) => {
+      const regex = new RegExp(value);
+      return regex.test(getProperty(filter.name, obj));
+    })
   })
 }
 

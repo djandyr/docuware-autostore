@@ -104,8 +104,7 @@ npm run start -- --dry-run
    > For allowed properties please see [IDocument type interface](https://github.com/djandyr/docuware-autostore/blob/master/src/types/DW_Rest.d.ts)
    
    * name {String}: Document property (can be accessed using dot notation)
-   * pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
-   * [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
+   * pattern {String|Array}: Array of regular expressions
    ---
    Example 1: Filter source documents by Intellix Trust level. A source document will be only be stored if `Document.IntellixTrust` property is Green, or Yellow
 
@@ -121,7 +120,7 @@ npm run start -- --dry-run
         "filters": [
             {
                 "name": "Title",
-                "pattern": ["*E2-XH-SADH*", "*X2-XH-SADH*"]
+                "pattern": ["E2-XH-SADH", "X2-XH-SADH"]
             }
         ]
 
@@ -132,9 +131,7 @@ npm run start -- --dry-run
    * name {String}: Field Database Name
    * filters {Object[]}: Filter Configuration
    		* name {String}: Document suggestion field property
-   		* pattern {String|Array}: One or more glob patterns. See available [matching features](https://github.com/micromatch/micromatch#matching-features)
-   		* [options] {Object}: See available [options](https://github.com/micromatch/micromatch#options)
-  
+   		* pattern {Array}: Array of regular expressions
   ---
   Example 1: Use only intellix suggestions fields subject and company where intellix confidence is green, or yellow
 
