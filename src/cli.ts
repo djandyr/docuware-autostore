@@ -279,7 +279,7 @@ function traceError(error: Error) {
  */
 function isFilterMatch(filters: IAutoStoreConfigFilter[], obj: object) {
   return filters.every((filter: IAutoStoreConfigFilter) => {
-    return filter.pattern.every((value: string) => {
+    return filter.pattern.some((value: string) => {
       const regex = new RegExp(value);
       return regex.test(getProperty(filter.name, obj));
     })
